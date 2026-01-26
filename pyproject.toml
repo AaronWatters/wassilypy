@@ -10,8 +10,16 @@ license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version", "description"]
 
+[project.optional-dependencies]
+test = ["pytest"]
+
 [tool.flit.module]
 name = "wassilypy"
 
 [tool.flit.sdist]
 include = ["wassilypy/data/"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
