@@ -23,6 +23,5 @@ def load_data():
         return data_file.read_text()
     except AttributeError:
         # Python 3.7-3.8 fallback
-        import importlib.resources as resources
-        with resources.open_text('wassilypy.data', 'sample.txt') as f:
+        with importlib.resources.open_text('wassilypy.data', 'sample.txt') as f:
             return f.read()
