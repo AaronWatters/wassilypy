@@ -5,10 +5,14 @@ build-backend = "flit_core.buildapi"
 [project]
 name = "wassilypy"
 authors = [{name = "Aaron Watters"}]
+requires-python = ">=3.8"
 readme = "README.md"
 license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version", "description"]
+dependencies = [
+    "h5gizmos"
+]
 
 [project.optional-dependencies]
 test = ["pytest"]
