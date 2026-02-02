@@ -145,15 +145,16 @@ class Frame(marking.Styled):
             point, size, offset, scaled)
     
     def square(self, point, side, offset=[0,0], scaled=False):
+        size = [side, side]
         return self.wrapResult(
             "square", marking.Rect, 
-            point, side, offset, scaled)
+            point, size, offset, scaled)
     
     def polyline(self, points):
         return self.wrapResult("polyline", marking.Poly, points)
     
     def polygon(self, points):
-        return self.wrapResult("polygon", marking.Poly, points)
+        return self.wrapResult("polygon", marking.Poly, points).filled().closed()
     
     def textBox(self, point, text, shift=[0,0], alignment="left", background=None):
         return self.wrapResult(
@@ -194,4 +195,12 @@ def force_uint8_array(x):
         raise TypeError("Expected bytes or numpy ndarray") 
 
 class Frame3d(marking.Styled):
-    pass
+    
+    def orbit(self):
+        return self.send_only("orbit")
+    
+    def clear(self):
+        return self.send_only("clear")
+    
+    def fit(self, border=0):
+        return self.send_only("fit", border)
