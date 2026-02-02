@@ -815,7 +815,7 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       this.requestRedraw();
       return this;
     }
-    setScaled(scaled) {
+    scaling(scaled) {
       this.scaled = scaled;
       this.requestRedraw();
       return this;
@@ -1203,6 +1203,35 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       this.depthValue = projectedPoints.reduce((sum, p2) => sum + p2[2], 0) / projectedPoints.length;
       return poly2d;
     }
+    normalVector(defaultV = null, epsilon = 1e-15) {
+      if (this.points.length < 3) {
+        throw new Error("At least 3 points are required to define a plane.");
+      }
+      const points = this.points;
+      const p0 = points[0];
+      const v1 = M(points[1], p0);
+      var v2;
+      var normal;
+      var normLength;
+      for (let i = 2; i < points.length; i++) {
+        v2 = M(points[i], p0);
+        normal = N(v1, v2);
+        normLength = g(normal);
+        if (normLength > epsilon) {
+          return v(1 / normLength, normal);
+        }
+      }
+      if (defaultV !== null) {
+        return defaultV;
+      }
+      throw new Error("Points are collinear; cannot define a unique normal vector.");
+    }
+    normalColored(defaultV = null, epsilon = 1e-6) {
+      const normal = this.normalVector(defaultV, epsilon);
+      const colorString = rgb(normal, null, epsilon);
+      this.colored(colorString);
+      return this;
+    }
   }
   const poly3d = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
     __proto__: null,
@@ -1379,19 +1408,24 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
      * @internal
      */
     prepareForRedraw() {
-      this.onFrame.clear();
-      this.onFrame.styleLike(this);
-      const depthsAndMarkings = [];
-      this.nameToMarking3d.forEach((marking3d2) => {
-        const marking2d = marking3d2.projectTo2D();
-        const depth = marking3d2.depth();
-        depthsAndMarkings.push([depth, marking2d]);
-      });
-      depthsAndMarkings.sort((a2, b2) => b2[0] - a2[0]);
-      depthsAndMarkings.forEach(([, marking2d]) => {
-        this.onFrame.addElement(marking2d);
-      });
-      this.onFrame.prepareForRedraw();
+      const diagram2 = this.onFrame.diagram;
+      try {
+        diagram2.disableRedraws();
+        this.onFrame.clear(false);
+        this.onFrame.styleLike(this);
+        const depthsAndMarkings = [];
+        this.nameToMarking3d.forEach((marking3d2) => {
+          const marking2d = marking3d2.projectTo2D();
+          const depth = marking3d2.depth();
+          depthsAndMarkings.push([depth, marking2d]);
+        });
+        depthsAndMarkings.sort((a2, b2) => b2[0] - a2[0]);
+        depthsAndMarkings.forEach(([, marking2d]) => {
+          this.onFrame.addElement(marking2d);
+        });
+      } finally {
+        diagram2.enableRedraws();
+      }
     }
     /**
      * Fit the frame to enclose all 3D markings.
@@ -1457,6 +1491,19 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       const image = new Image3d(imagename, point, size, offset, this, scaled);
       this.nameToMarking3d.set(image.objectName, image);
       return image;
+    }
+    /**
+     * place an image from a URL in 3D space.
+     * @param point 
+     * @param url 
+     * @param size 
+     * @param offset 
+     * @param scaled 
+     * @returns 
+     */
+    imageFromURL(point, url, size = null, offset = [0, 0], scaled = false) {
+      this.onFrame.diagram.nameImageFromURL(url, url, false);
+      return this.namedImage(point, url, size, offset, scaled);
     }
     /**
      * Position a text box in 3D space.
@@ -2208,13 +2255,15 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       }
     }
     /** Clear all elements from frame, forgetting them and removing from draw order and name map. */
-    clear() {
+    clear(redraw = true) {
       this.nameToMarking.forEach((element) => {
         element.forget();
       });
       this.nameToMarking.clear();
       this.drawOrder = [];
-      this.diagram.requestRedraw();
+      if (redraw) {
+        this.requestRedraw();
+      }
     }
     /** Receive canvas events of this eventType.
      * @param eventType String name of event to recieve.
@@ -2239,6 +2288,28 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
     nameImageFromURL(name2, url) {
       this.diagram.nameImageFromURL(name2, url);
       return this;
+    }
+    /** Make an image from PNG binary data usable in a diagram by name.
+     * @param name The name to associate with the image.
+     * @param pngdata The PNG binary data as a Uint8Array.
+     * @returns The current frame for chaining.
+     */
+    nameImageFromPNGData(name2, pngdata) {
+      this.diagram.nameImageFromPNGData(name2, pngdata);
+      return this;
+    }
+    /** place an image using a PNG data (convenience, may leak memory if used too much)
+     * @param point The location of the image in model coordinates.
+     * @param pngdata The image data in PNG format.
+     * @param size The size of the image in model units or pixels if not scaled(default: null for natural size).
+     * @param offset The offset of the image from the point in model units (default: [0,0]).
+     * @param scaled Whether the size is scaled (default: false).
+     * @returns The created image marking.
+    */
+    pngImage(point, pngdata, size = null, offset = [0, 0], scaled = false) {
+      const name2 = this.freshName("png");
+      this.nameImageFromPNGData(name2, pngdata);
+      return this.namedImage(point, name2, size, offset, scaled);
     }
     /** Fit visible elements into canvas.
      * @param border Optional border in cartesian units to leave around fitted elements.  Default is 0.
@@ -2473,6 +2544,18 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       this.addElement(result);
       return result;
     }
+    /** place an image using a URL (convenience)
+     * @param point The location of the image in model coordinates.
+     * @param url The URL of the image to place.
+     * @param size The size of the image in model units or pixels if not scaled(default: null for natural size).
+     * @param offset The offset of the image from the point in model units (default: [0,0]).
+     * @param scaled Whether the size is scaled (default: false).
+     * @returns The created image marking.
+    */
+    imageFromURL(point, url, size = null, offset = [0, 0], scaled = false) {
+      this.diagram.nameImageFromURL(url, url, false);
+      return this.namedImage(point, url, size, offset, scaled);
+    }
     /** A rectangle marking.
      * @param point The location of the rectangle in model coordinates.
      * @param size The size of the rectangle in model units (or pixels if not scaled).
@@ -2563,6 +2646,17 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
     const diag = new Diagram(container, width, height);
     return diag.mainFrame;
   }
+  function imageFromPNGBytes(pngBytes) {
+    const copy = new Uint8Array(pngBytes);
+    const blob = new Blob([copy], { type: "image/png" });
+    const url = URL.createObjectURL(blob);
+    const image = new Image();
+    image.src = url;
+    image.onload = () => {
+      URL.revokeObjectURL(url);
+    };
+    return image;
+  }
   class Diagram {
     constructor(domObject, width, height) {
       // The container for the canvas
@@ -2578,6 +2672,7 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       __publicField(this, "mainFrame");
       __publicField(this, "nameToImage");
       __publicField(this, "redraw_requested", false);
+      __publicField(this, "disable_redraw", false);
       __publicField(this, "deferred_fit_border", null);
       __publicField(this, "autoRedraw", true);
       __publicField(this, "watchedEvents", /* @__PURE__ */ new Set());
@@ -2697,12 +2792,30 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
     /** Make an image from a URL usable in a diagram by name. 
      * @param name The name to assign to the image.
      * @param url The URL of the image.
+     * @param replace Whether to replace an existing image with the same name (default: true).
      * @returns The diagram for chaining.
     */
-    nameImageFromURL(name2, url) {
+    nameImageFromURL(name2, url, replace = true) {
+      if (!replace) {
+        const existing = this.nameToImage.get(name2);
+        if (existing !== void 0) {
+          return this;
+        }
+      }
       const image = new Image();
       image.src = url;
       this.nameImage(name2, image);
+    }
+    /**
+     * Name an image from PNG binary data.
+     * @param name The name to assign to the image.
+     * @param pngdata The PNG binary data as a Uint8Array.
+     * @returns The diagram for chaining.
+     */
+    nameImageFromPNGData(name2, pngdata) {
+      const imageElement = imageFromPNGBytes(pngdata);
+      this.nameImage(name2, imageElement);
+      return this;
     }
     /** Convert cartesian xy to canvas xy (with y inverted) 
      * @internal
@@ -2734,8 +2847,17 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
         this.requestRedraw();
       }
     }
+    disableRedraws() {
+      this.disable_redraw = true;
+    }
+    enableRedraws() {
+      this.disable_redraw = false;
+    }
     /** Request a redraw of the diagram */
     requestRedraw() {
+      if (this.disable_redraw) {
+        return;
+      }
       if (!this.redraw_requested) {
         this.redraw_requested = true;
         if (!this.autoRedraw) {
@@ -2897,7 +3019,8 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
     __proto__: null,
     CanvasStats,
     Diagram,
-    drawOn
+    drawOn,
+    imageFromPNGBytes
   }, Symbol.toStringTag, { value: "Module" }));
   const name = "wassilyjs";
   exports2.circle = circle;
