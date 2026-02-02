@@ -69,6 +69,17 @@ class Styled:
     def dashed(self, dash_list_or_null):
         return self.send_only("dashed", dash_list_or_null)
     
+    def setFramePoint(self, xy):
+        xy = listiffy(xy)
+        return self.send_only("setFramePoint", xy)
+    
+    def setPixel(self, xy):
+        xy = listiffy(xy)
+        return self.send_only("setPixel", xy)
+    
+    def position(self, xy):
+        return self.setFramePoint(xy)
+    
     def forget(self):
         self.send_only("forget")
         self.js_reference = None
@@ -78,26 +89,86 @@ class Styled:
         self.send_only("requestRedraw")
 
 
-class Image(Styled):
-    pass
-
 class Line(Styled):
-    pass
+    
+    def startAt(self, xy):
+        xy = listiffy(xy)
+        return self.send_only("startAt", xy)
+    
+    def endAt(self, xy):
+        xy = listiffy(xy)
+        return self.send_only("endAt", xy)
 
 class Circle(Styled):
-    pass
+    
+    def cemterAt(self, xy):
+        xy = listiffy(xy)
+        return self.send_only("centerAt", xy)
+    
+    def resize(self, radius):
+        return self.send_only("resize", radius)
+    
+    def scaling(self, boolean):
+        return self.send_only("scaling", boolean)
 
 class Rect(Styled):
+    
+    def degrees(self, angle):
+        return self.send_only("degrees", angle)
+    
+    def resize(self, wh):
+        wh = listiffy(wh)
+        return self.send_only("resize", wh)
+    
+    def offsetBy(self, xy):
+        xy = listiffy(xy)
+        return self.send_only("offsetBy", xy)
+    
+    def scaling(self, boolean):
+        return self.send_only("scaling", boolean)
+    
+    def locateAt(self, xy):
+        xy = listiffy(xy)
+        return self.send_only("locateAt", xy)
+
+class Image(Rect):
     pass
 
-class TextBox(Styled):
-    pass
+class TextBox(Rect):
+    
+    def setText(self, text):
+        return self.send_only("setText", text)
+    
+    def valigned(self, alignment):
+        return self.send_only("valigned", alignment)
+    
+    def aligned(self, alignment):
+        return self.send_only("aligned", alignment)
+    
+    def setShift(self, shift):
+        shift = listiffy(shift)
+        return self.send_only("setShift", shift)
+    
+    def boxed(self, background_spec_or_null):
+        return self.send_only("boxed", background_spec_or_null)
+    
+    async def getSize(self):
+        result = await gz.get(self.js_reference.getSize())
+        return result
+
 
 class Poly(Styled):
-    pass
+    
+    def vertices(self, points):
+        points = listiffy(points)
+        return self.send_only("vertices", points)
+    
+    def closed(self, boolean=True):
+        return self.send_only("closed", boolean)
 
 class Star(Styled):
     pass
 
 class Arrow(Styled):
     pass
+
