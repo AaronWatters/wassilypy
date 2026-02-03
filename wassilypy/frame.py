@@ -222,6 +222,11 @@ class Frame3d(marking.Styled):
         return self.wrapResult(
             "imageFromURL", marking.Image3d,
             point3d, url, size, offset, scaled)
+    
+    def namedImage(self, point3d, name, size=None, offset=[0,0], scaled=False):
+        return self.wrapResult(
+            "namedImage", marking.Image3d,
+            point3d, name, size, offset, scaled)
 
     def textBox(self, point3d, text, shift=[0,0], alignment="left", background=None):
         return self.wrapResult(
@@ -231,3 +236,11 @@ class Frame3d(marking.Styled):
     def line(self, start3d, end3d):
         return self.wrapResult("line", marking.Line3d, start3d, end3d)
     
+    def polygon(self, points3d):
+        return self.wrapResult("polygon", marking.Poly3d, points3d)
+    
+    def polyline(self, points3d):
+        return self.wrapResult("polyline", marking.Poly3d, points3d)
+    
+    def circle(self, center3d, radius):
+        return self.wrapResult("circle", marking.Circle3d, center3d, radius)
