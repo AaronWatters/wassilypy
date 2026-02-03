@@ -5,6 +5,8 @@ import importlib.resources
 __version__ = "0.1.0"
 
 
+from .frame import Diagram, Frame, wassily2d
+
 def hello():
     """Return a hello world message."""
     return "Hello, World!"
