@@ -12,6 +12,16 @@ from . import marking
 from .marking import listiffy
 
 
+async def wassily2d(width, height=None, link=True):
+    diagram = Diagram(width, height)
+    if link:
+        await diagram.link()
+    else:
+        await diagram.show()
+    return diagram.mainFrame
+
+
+
 class Diagram(gz.jQueryComponent):
 
     def __init__(self, width, height=None):
@@ -54,15 +64,15 @@ class Frame(marking.Styled):
         super().__init__(js_reference, on_diagram)
 
     def clear(self):
-        self.send_only("clear")
+        return self.send_only("clear")
 
     def fit(self, border=0):
-        self.send_only("fit", border)
+        return self.send_only("fit", border)
 
     def setAffine(self, listMatrix):
         listMatrix = listiffy(listMatrix)
-        self.send_only("setAffine", listMatrix)
-
+        return self.send_only("setAffine", listMatrix)
+    
     def regionFrame(self,
                     fromMinxy,
                     fromMaxxy,
@@ -99,20 +109,20 @@ class Frame(marking.Styled):
         return self.wrapResult("getStyledByName", constructor, styled_name)  
     
     def nameImageFromURL(self, name, url):
-        self.send_only("nameImageFromURL", name, url)
+        return self.send_only("nameImageFromURL", name, url)
 
     def pauseRedraw(self):
-        self.send_only("pauseRedraw")
+        return self.send_only("pauseRedraw")
 
     def resumeRedraw(self):
-        self.send_only("resumeRedraw")
+        return self.send_only("resumeRedraw")
 
     def nameImageFromPNGData(self, name, png_data):
         """
         name a PNG encoded binary image from raw data.
         """
         png_data = force_uint8_array(png_data)
-        self.send_only("nameImageFromPNGData", name, png_data)
+        return self.send_only("nameImageFromPNGData", name, png_data)
 
     def pngImage(self, point, pngdata, size=None, offset=[0,0], scaled=False):
         pngdata = force_uint8_array(pngdata)
@@ -204,3 +214,20 @@ class Frame3d(marking.Styled):
     
     def fit(self, border=0):
         return self.send_only("fit", border)
+    
+    def nameImageFromURL(self, name, url):
+        return self.send_only("nameImageFromURL", name, url)
+    
+    def imageFromURL(self, point3d, url, size=None, offset=[0,0], scaled=False):
+        return self.wrapResult(
+            "imageFromURL", marking.Image3d,
+            point3d, url, size, offset, scaled)
+
+    def textBox(self, point3d, text, shift=[0,0], alignment="left", background=None):
+        return self.wrapResult(
+            "textBox", marking.TextBox3d,
+            point3d, text, shift, alignment, background)
+    
+    def line(self, start3d, end3d):
+        return self.wrapResult("line", marking.Line3d, start3d, end3d)
+    

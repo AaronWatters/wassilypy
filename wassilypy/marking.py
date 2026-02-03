@@ -49,10 +49,10 @@ class Styled:
         self.send_only("handleEvent", eventType, handlerOrNull)
 
     def join(self, join_spec):
-        self.send_only("join", join_spec)
+        return self.send_only("join", join_spec)
 
     def font(self, font_spec):
-        self.send_only("font", font_spec)
+        return self.send_only("font", font_spec)
 
     def stroked(self):
         return self.send_only("stroked")
@@ -86,7 +86,7 @@ class Styled:
         self.on_diagram = None
 
     def requestRedraw(self):
-        self.send_only("requestRedraw")
+        return self.send_only("requestRedraw")
 
 
 class Line(Styled):
@@ -101,7 +101,7 @@ class Line(Styled):
 
 class Circle(Styled):
     
-    def cemterAt(self, xy):
+    def centerAt(self, xy):
         xy = listiffy(xy)
         return self.send_only("centerAt", xy)
     
@@ -172,3 +172,25 @@ class Star(Styled):
 class Arrow(Styled):
     pass
 
+class Image3d(Styled):
+    pass
+
+class TextBox3d(Styled):
+    pass
+
+class Poly3d(Styled):
+
+    def closed(self, boolean=True):
+        return self.send_only("closed", boolean)
+    
+    def normalColored(self, defaultxyz=[1,0,0])
+        return self.send_only("normalColored", defaultxyz)
+
+class Rect3d(Styled):
+    pass
+
+class Line3d(Styled):
+    pass
+
+class Circle3d(Styled):
+    pass
