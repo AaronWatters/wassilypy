@@ -1260,6 +1260,21 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       circle2d.styleLike(this);
       return circle2d;
     }
+    centered(center) {
+      this.center = center;
+      this.requestRedraw();
+      return this;
+    }
+    resized(radius) {
+      this.radius = radius;
+      this.requestRedraw();
+      return this;
+    }
+    scaling(scaled) {
+      this.scaled = scaled;
+      this.requestRedraw();
+      return this;
+    }
   }
   class Rect3d extends Marking3d {
     constructor(point, size = null, offset = [0, 0], onFrame3d, scaled = true, rotationDegrees = 0) {
@@ -1313,7 +1328,7 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       this.requestRedraw();
       return this;
     }
-    setScaled(scaled) {
+    scaling(scaled) {
       this.scaled = scaled;
       this.requestRedraw();
       return this;
@@ -1408,9 +1423,8 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
      * @internal
      */
     prepareForRedraw() {
-      const diagram2 = this.onFrame.diagram;
+      this.onFrame.diagram;
       try {
-        diagram2.disableRedraws();
         this.onFrame.clear(false);
         this.onFrame.styleLike(this);
         const depthsAndMarkings = [];
@@ -1424,7 +1438,6 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
           this.onFrame.addElement(marking2d);
         });
       } finally {
-        diagram2.enableRedraws();
       }
     }
     /**
@@ -1542,14 +1555,24 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       this.nameToMarking3d.set(poly2.objectName, poly2);
       return poly2;
     }
+    polygon(points) {
+      const result = this.poly(points);
+      result.closed(true).filled();
+      return result;
+    }
+    polyline(points) {
+      const result = this.poly(points);
+      result.closed(false).stroked();
+      return result;
+    }
     /**
      * Add a circle marking in 3D space.
      * @param center the center of the circle in 3D space
      * @param radius the radius of the circle
      * @returns circle3d.Circle3d
      */
-    circle(center, radius) {
-      const circle2 = new Circle3d(center, radius, this);
+    circle(center, radius, scaled = true) {
+      const circle2 = new Circle3d(center, radius, this, scaled);
       this.nameToMarking3d.set(circle2.objectName, circle2);
       return circle2;
     }
@@ -2837,9 +2860,14 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
     }
     /** Draw the diagram */
     draw() {
-      this.clear();
-      this.mainFrame.prepareForRedraw();
-      this.mainFrame.draw();
+      try {
+        this.disableRedraws();
+        this.clear();
+        this.mainFrame.prepareForRedraw();
+        this.mainFrame.draw();
+      } finally {
+        this.enableRedraws();
+      }
       if (this.deferred_fit_border !== null) {
         const border = this.deferred_fit_border;
         this.fit(border);
