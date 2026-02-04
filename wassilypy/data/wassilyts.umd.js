@@ -1072,6 +1072,9 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       this.frame3d = frame3d2;
       this.projection = frame3d2.projection;
       this.originalProjector = frame3d2.projection;
+      if (this.frame3d.onFrame === null) {
+        throw new Error("frame3d.onFrame is null, cannot create Orbiter.");
+      }
       const onFrame = frame3d2.onFrame;
       onFrame.onEvent("pointerdown", (element, eventType, canvasXY, cartesianXY, frameXY) => {
         return this.pointerDownHandler(element, eventType, canvasXY, cartesianXY, frameXY);
@@ -1124,7 +1127,7 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
   class Marking3d extends Styled {
     // depth can be calculated or set
     constructor(onFrame3d) {
-      super(onFrame3d.onFrame);
+      super(onFrame3d.toFrame);
       __publicField(this, "onFrame3d");
       __publicField(this, "depthValue", null);
       this.onFrame3d = onFrame3d;
@@ -1148,9 +1151,13 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
     }
     draw() {
     }
+    rename(newname) {
+      this.onFrame3d.deleteElement(this);
+      this.objectName = newname;
+      this.onFrame3d.addElement(this);
+    }
     forget() {
-      this.onFrame3d.nameToMarking3d.delete(this.objectName);
-      this.onFrame3d.onFrame.diagram.nameToStyled.delete(this.objectName);
+      this.onFrame3d.deleteElement(this);
       this.defunct = true;
       this.requestRedraw();
     }
@@ -1226,9 +1233,9 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       }
       throw new Error("Points are collinear; cannot define a unique normal vector.");
     }
-    normalColored(defaultV = null, epsilon = 1e-6) {
+    normalColored(defaultV = null, alpha = null, epsilon = 1e-6) {
       const normal = this.normalVector(defaultV, epsilon);
-      const colorString = rgb(normal, null, epsilon);
+      const colorString = rgb(normal, alpha, epsilon);
       this.colored(colorString);
       return this;
     }
@@ -1388,15 +1395,23 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       super(fromFrame);
       __publicField(this, "projection");
       //fromFrame: frame.Frame;
-      __publicField(this, "onFrame");
+      __publicField(this, "toFrame");
       __publicField(this, "nameToMarking3d", /* @__PURE__ */ new Map());
       __publicField(this, "orbiter", null);
       this.projection = projection2;
-      this.onFrame = new Frame(fromFrame.diagram, null, fromFrame);
-      fromFrame.addElement(this.onFrame);
+      this.toFrame = new Frame(fromFrame.diagram, null, fromFrame);
+      fromFrame.addElement(this.toFrame);
     }
-    requestRedraw() {
-      this.onFrame.requestRedraw();
+    addElement(element) {
+      if (!this.isLive()) {
+        throw new Error("Cannot add element to detached Frame3d.");
+      }
+      this.nameToMarking3d.set(element.objectName, element);
+      this.onFrame.diagram.addStyled(element);
+    }
+    deleteElement(element) {
+      this.nameToMarking3d.delete(element.objectName);
+      this.onFrame.diagram.deleteStyled(element);
     }
     /**
      * Set up an orbiter to control this frame to allow interactive rotation via mouse dragging.
@@ -1416,17 +1431,18 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
         element.forget();
       });
       this.nameToMarking3d.clear();
-      this.onFrame.clear();
+      this.toFrame.clear();
     }
     /**
      * Prepare the 3D frame for redraw by projecting all 3D markings to 2D and drawing them in depth order.
      * @internal
      */
     prepareForRedraw() {
-      this.onFrame.diagram;
+      const toFrame = this.toFrame;
+      toFrame.diagram;
       try {
-        this.onFrame.clear(false);
-        this.onFrame.styleLike(this);
+        toFrame.clear(false);
+        toFrame.styleLike(this);
         const depthsAndMarkings = [];
         this.nameToMarking3d.forEach((marking3d2) => {
           const marking2d = marking3d2.projectTo2D();
@@ -1435,7 +1451,7 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
         });
         depthsAndMarkings.sort((a2, b2) => b2[0] - a2[0]);
         depthsAndMarkings.forEach(([, marking2d]) => {
-          this.onFrame.addElement(marking2d);
+          toFrame.addElement(marking2d);
         });
       } finally {
       }
@@ -1448,28 +1464,28 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       if (this.nameToMarking3d.size === 0) {
         return;
       }
-      this.onFrame.fit(border);
+      this.toFrame.fit(border);
     }
     /**
      * Draw the frame by drawing the onFrame.
      * @internal
      */
     draw() {
-      this.onFrame.draw();
+      this.toFrame.draw();
     }
     /**
      * Return the pixel position of the frame in the diagram.
      * @returns [number, number] pixel position
      */
     getPixel() {
-      return this.onFrame.getPixel();
+      return this.toFrame.getPixel();
     }
     /**
      * set the pixel position of the frame in the diagram.  
      * @param position 
      */
     setPixel(position) {
-      this.onFrame.setPixel(position);
+      this.toFrame.setPixel(position);
     }
     /**
      * Register an image with a name in the frame's image cache.
@@ -1478,7 +1494,7 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
      * @returns frame3d.Frame3d for chaining
      */
     nameImage(name2, image) {
-      this.onFrame.nameImage(name2, image);
+      this.toFrame.nameImage(name2, image);
       return this;
     }
     /**
@@ -1488,7 +1504,7 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
      * @returns frame3d.Frame3d for chaining
      */
     nameImageFromURL(name2, url) {
-      this.onFrame.nameImageFromURL(name2, url);
+      this.toFrame.nameImageFromURL(name2, url);
       return this;
     }
     /**
@@ -1515,7 +1531,7 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
      * @returns 
      */
     imageFromURL(point, url, size = null, offset = [0, 0], scaled = false) {
-      this.onFrame.diagram.nameImageFromURL(url, url, false);
+      this.toFrame.diagram.nameImageFromURL(url, url, false);
       return this.namedImage(point, url, size, offset, scaled);
     }
     /**
@@ -2479,6 +2495,10 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
      * @param requestRedraw Whether to request a redraw after adding the element (default: true).   
      */
     addElement(styled2, requestRedraw = true) {
+      var _a;
+      if (styled2.onFrame !== null && styled2.onFrame !== this) {
+        throw new Error(`Cannot add element ${styled2.objectName} to frame ${this.objectName} because it belongs to another frame ${(_a = styled2.onFrame) == null ? void 0 : _a.objectName}.`);
+      }
       const name2 = styled2.objectName;
       const diagram2 = this.diagram;
       diagram2.resetStats();
