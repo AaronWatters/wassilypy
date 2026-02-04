@@ -183,8 +183,8 @@ class Poly3d(Styled):
     def closed(self, boolean=True):
         return self.send_only("closed", boolean)
     
-    def normalColored(self, defaultxyz=[1,0,0])
-        return self.send_only("normalColored", defaultxyz)
+    def normalColored(self, defaultxyz=[1,0,0], alpha=None):
+        return self.send_only("normalColored", defaultxyz, alpha)
 
 class Rect3d(Styled):
     pass
