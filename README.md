@@ -1,6 +1,8 @@
 # wassilypy
 Python wrapper for wassilyts browser based vector graphics in 2d and 3d
 
+<img src="icosahedron.png" width="400"/>
+
 ## Development
 
 ### Installing in Development Mode

@@ -1,4 +1,4 @@
-"""Wassily Python wrapper - simple hello world example."""
+"""Wassily Python wrapper"""
 
 import importlib.resources
 
