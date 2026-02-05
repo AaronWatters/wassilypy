@@ -1061,6 +1061,221 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
     __proto__: null,
     Poly
   }, Symbol.toStringTag, { value: "Module" }));
+  const EPSILON = 1e-6;
+  function perpendicularComponent(toVector, fromVector) {
+    const V = toVector;
+    const D2 = fromVector;
+    const n = B(V);
+    const dot = q(n, D2);
+    const proj = v(dot, n);
+    const perp = M(D2, proj);
+    return perp;
+  }
+  function affine3d(xyz) {
+    return [xyz[0], xyz[1], xyz[2], 1];
+  }
+  function ProjectionMatrix(eyePoint, lookAtPoint, upVector = null, epsilon = EPSILON) {
+    const E2 = eyePoint;
+    const C2 = lookAtPoint;
+    const direction = M(C2, E2);
+    const length = g(direction);
+    if (length < epsilon) {
+      throw new Error("Eye point and look at point are too close together.");
+    }
+    const Vz = B(direction);
+    if (upVector === null) {
+      upVector = [0, 1, 0];
+    }
+    upVector = perpendicularComponent(Vz, upVector);
+    if (g(upVector) < epsilon) {
+      upVector = perpendicularComponent(Vz, [1, 1, 0]);
+    }
+    const up = B(upVector);
+    const right = B(N(up, Vz));
+    const At = [
+      affine3d(p(E2, right)),
+      affine3d(p(E2, up)),
+      affine3d(p(E2, Vz)),
+      // don't distort the Z axis
+      affine3d(E2)
+    ];
+    const A2 = S(At);
+    const B$1 = [
+      [1, 0, 0, 0],
+      [0, 1, 0, 0],
+      [0, 0, 1, 0],
+      [1, 1, 1, 1]
+    ];
+    const invA = G(A2);
+    const result = T(B$1, invA);
+    return result;
+  }
+  class Projector {
+    constructor(eyePoint, lookAtPoint, perspective = true, upVector = null) {
+      __publicField(this, "eyePoint");
+      __publicField(this, "lookAtPoint");
+      __publicField(this, "upVector");
+      __publicField(this, "projectionMatrix", null);
+      __publicField(this, "focusLength", 1);
+      // distance from eye to focus point
+      __publicField(this, "zscale", 1);
+      __publicField(this, "perspective", true);
+      this.eyePoint = eyePoint;
+      this.lookAtPoint = lookAtPoint;
+      if (upVector === null) {
+        upVector = [0, 1, 0];
+      }
+      this.upVector = upVector;
+      this.perspective = perspective;
+      this.getProjectionMatrix();
+    }
+    lookAt(lookAtPoint, epsilon = EPSILON) {
+      this.lookAtPoint = lookAtPoint;
+      this.projectionMatrix = null;
+      this.getProjectionMatrix(epsilon);
+      return this;
+    }
+    lookFrom(eyePoint, upVector = null, epsilon = EPSILON) {
+      this.eyePoint = eyePoint;
+      if (upVector !== null) {
+        this.upVector = upVector;
+      }
+      this.projectionMatrix = null;
+      this.getProjectionMatrix(epsilon);
+      return this;
+    }
+    getProjectionMatrix(epsilon = EPSILON) {
+      const zDirection = M(this.lookAtPoint, this.eyePoint);
+      const length = g(zDirection);
+      if (length < epsilon) {
+        throw new Error("Eye point and look at point are too close together.");
+      }
+      const zNormalized = B(zDirection);
+      var upComponent = perpendicularComponent(zNormalized, this.upVector);
+      if (g(upComponent) < epsilon) {
+        upComponent = perpendicularComponent(zNormalized, [1, 1, 0]);
+      }
+      this.upVector = B(upComponent);
+      this.focusLength = length;
+      this.zscale = length;
+      this.projectionMatrix = ProjectionMatrix(this.eyePoint, this.lookAtPoint, this.upVector, epsilon);
+      return this.projectionMatrix;
+    }
+    /** Rotate the projection by moving the eye point around the lookAt point.
+     * @param rotationMatrix3d - The rotation matrix to apply in projected space.
+     */
+    rotation(rotationMatrix3d) {
+      const upVector = this.upVector;
+      const lookAtPoint = this.lookAtPoint;
+      const eyePoint = this.eyePoint;
+      const orientation = this.orientation();
+      const inverseOrientation = G(orientation);
+      const orientProjection = T(rotationMatrix3d, orientation);
+      const oriented = T(inverseOrientation, orientProjection);
+      const newUpVector = $(oriented, upVector);
+      const offset = M(eyePoint, lookAtPoint);
+      const newoffset = $(oriented, offset);
+      const newEyePoint = p(lookAtPoint, newoffset);
+      const result = new Projector(newEyePoint, lookAtPoint, this.perspective, newUpVector);
+      return result;
+    }
+    distanceScale(atPoint) {
+      const toPoint = M(atPoint, this.eyePoint);
+      const distance = g(toPoint);
+      if (distance < EPSILON) {
+        return 1;
+      }
+      const scale = this.focusLength / distance;
+      return scale;
+    }
+    /** 3x3 3d rotation matrix based on xy offset adjusted by focuslength  */
+    XYOffsetRotation(startXY, endXY) {
+      const offset = M(endXY, startXY);
+      const [dx, dy] = offset;
+      const focusLength = this.focusLength;
+      const rotation = this.rotateYawPitch(-dx / focusLength, -dy / focusLength);
+      return rotation;
+    }
+    /* not used
+    rotateXY(startXY: tsvector.Vector, endXY: tsvector.Vector, projectionMatrix: tsvector.Matrix | null): Projector {
+        // Create a rotation matrix for the XY mouse offset
+        const offset = tsvector.vSub(endXY, startXY);
+        const [dx, dy] = offset;
+        const focusLength = this.focusLength;
+        //("Focus Length:", focusLength, "Offset:", offset);
+        //const affineRotation = OrbitRotation([dx / focusLength, dy / focusLength]);
+        const rotation = this.rotateYawPitch(dx / focusLength, dy / focusLength);
+        const affineRotation = tsvector.affine3d(rotation);
+        return this.rotate(affineRotation, projectionMatrix);
+    };
+    */
+    rotateYawPitch(pitch, yaw) {
+      const Myaw = J(-yaw);
+      const Mpitch = K(-pitch);
+      const rotated = T(Mpitch, Myaw);
+      return rotated;
+    }
+    /** Rotate the projection matrix by the given affine rotation matrix at the lookAtPoint.
+     * @param affineRotation - The affine rotation matrix to apply.
+     * @param projectionMatrix - Optional, if not provided, will use the current projection matrix.
+     */
+    /* not used ???
+    rotate(affineRotation: tsvector.Matrix, projectionMatrix: tsvector.Matrix | null = null): Projector {
+        if (projectionMatrix === null) {
+            if (this.projectionMatrix === null) {
+                this.getProjectionMatrix();
+            }
+            projectionMatrix = this.projectionMatrix;
+        }
+        // projectionMatrix is currently at the eyePoint
+        // Apply the rotation at the lookAtPoint and then translate back to the eyePoint
+        const shift = tsvector.vSub(this.eyePoint, this.lookAtPoint);
+        const translateToLookAt = tsvector.affine3d(null, shift);
+        const translated = tsvector.MMProduct(translateToLookAt, projectionMatrix!);
+        const rotated = tsvector.MMProduct(affineRotation, translated);
+        const invRotation = tsvector.MInverse(affineRotation);
+        const rotatedShiftAffine = tsvector.MvProduct(invRotation, affine3d(shift));
+        const rotatedShift = rotatedShiftAffine.slice(0, 3); // drop the last element
+        const translateBack = tsvector.affine3d(null, tsvector.vScale(-1, rotatedShift));
+        this.projectionMatrix = tsvector.MMProduct(translateBack, rotated);
+        return this;
+    };
+    */
+    orientation() {
+      if (this.projectionMatrix === null) {
+        this.getProjectionMatrix();
+      }
+      const projection2 = this.projectionMatrix;
+      return [
+        projection2[0].slice(0, 3),
+        projection2[1].slice(0, 3),
+        projection2[2].slice(0, 3)
+      ];
+    }
+    project(xyz) {
+      if (this.projectionMatrix === null) {
+        this.getProjectionMatrix();
+      }
+      const affine = affine3d(xyz);
+      const projected = $(this.projectionMatrix, affine);
+      projected[2] /= this.zscale;
+      const P2 = [projected[0] / projected[3], projected[1] / projected[3], projected[2] / projected[3]];
+      if (this.perspective) {
+        const scale = 1 / P2[2];
+        return [P2[0] * scale, P2[1] * scale, P2[2]];
+      } else {
+        return [P2[0], P2[1], P2[2]];
+      }
+    }
+  }
+  const projection = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+    __proto__: null,
+    EPSILON,
+    ProjectionMatrix,
+    Projector,
+    affine3d,
+    perpendicularComponent
+  }, Symbol.toStringTag, { value: "Module" }));
   class Orbiter {
     constructor(frame3d2) {
       __publicField(this, "frame3d");
@@ -1402,6 +1617,14 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       this.toFrame = new Frame(fromFrame.diagram, null, fromFrame);
       fromFrame.addElement(this.toFrame);
     }
+    lookAt(lookAtPoint, epsilon = EPSILON) {
+      this.projection.lookAt(lookAtPoint, epsilon);
+      return this;
+    }
+    lookFrom(eyePoint, upVector = null, epsilon = EPSILON) {
+      this.projection.lookFrom(eyePoint, upVector, epsilon);
+      return this;
+    }
     addElement(element) {
       if (!this.isLive()) {
         throw new Error("Cannot add element to detached Frame3d.");
@@ -1610,220 +1833,6 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
   const frame3d = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
     __proto__: null,
     Frame3d
-  }, Symbol.toStringTag, { value: "Module" }));
-  const EPSILON = 1e-6;
-  function perpendicularComponent(toVector, fromVector) {
-    const V = toVector;
-    const D2 = fromVector;
-    const n = B(V);
-    const dot = q(n, D2);
-    const proj = v(dot, n);
-    const perp = M(D2, proj);
-    return perp;
-  }
-  function affine3d(xyz) {
-    return [xyz[0], xyz[1], xyz[2], 1];
-  }
-  function ProjectionMatrix(eyePoint, lookAtPoint, upVector = null, epsilon = EPSILON) {
-    const E2 = eyePoint;
-    const C2 = lookAtPoint;
-    const direction = M(C2, E2);
-    const length = g(direction);
-    if (length < epsilon) {
-      throw new Error("Eye point and look at point are too close together.");
-    }
-    const Vz = B(direction);
-    if (upVector === null) {
-      upVector = [0, 1, 0];
-    }
-    upVector = perpendicularComponent(Vz, upVector);
-    if (g(upVector) < epsilon) {
-      upVector = perpendicularComponent(Vz, [1, 1, 0]);
-    }
-    const up = B(upVector);
-    const right = B(N(up, Vz));
-    const At = [
-      affine3d(p(E2, right)),
-      affine3d(p(E2, up)),
-      affine3d(p(E2, Vz)),
-      // don't distort the Z axis
-      affine3d(E2)
-    ];
-    const A2 = S(At);
-    const B$1 = [
-      [1, 0, 0, 0],
-      [0, 1, 0, 0],
-      [0, 0, 1, 0],
-      [1, 1, 1, 1]
-    ];
-    const invA = G(A2);
-    const result = T(B$1, invA);
-    return result;
-  }
-  class Projector {
-    constructor(eyePoint, lookAtPoint, perspective = true, upVector = null) {
-      __publicField(this, "eyePoint");
-      __publicField(this, "lookAtPoint");
-      __publicField(this, "upVector");
-      __publicField(this, "projectionMatrix", null);
-      __publicField(this, "focusLength", 1);
-      // distance from eye to focus point
-      __publicField(this, "zscale", 1);
-      __publicField(this, "perspective", true);
-      this.eyePoint = eyePoint;
-      this.lookAtPoint = lookAtPoint;
-      if (upVector === null) {
-        upVector = [0, 1, 0];
-      }
-      this.upVector = upVector;
-      this.perspective = perspective;
-      this.getProjectionMatrix();
-    }
-    lookAt(lookAtPoint, epsilon = EPSILON) {
-      this.lookAtPoint = lookAtPoint;
-      this.projectionMatrix = null;
-      this.getProjectionMatrix(epsilon);
-      return this;
-    }
-    lookFrom(eyePoint, upVector = null, epsilon = EPSILON) {
-      this.eyePoint = eyePoint;
-      if (upVector !== null) {
-        this.upVector = upVector;
-      }
-      this.projectionMatrix = null;
-      this.getProjectionMatrix(epsilon);
-      return this;
-    }
-    getProjectionMatrix(epsilon = EPSILON) {
-      const zDirection = M(this.lookAtPoint, this.eyePoint);
-      const length = g(zDirection);
-      if (length < epsilon) {
-        throw new Error("Eye point and look at point are too close together.");
-      }
-      const zNormalized = B(zDirection);
-      var upComponent = perpendicularComponent(zNormalized, this.upVector);
-      if (g(upComponent) < epsilon) {
-        upComponent = perpendicularComponent(zNormalized, [1, 1, 0]);
-      }
-      this.upVector = B(upComponent);
-      this.focusLength = length;
-      this.zscale = length;
-      this.projectionMatrix = ProjectionMatrix(this.eyePoint, this.lookAtPoint, this.upVector, epsilon);
-      return this.projectionMatrix;
-    }
-    /** Rotate the projection by moving the eye point around the lookAt point.
-     * @param rotationMatrix3d - The rotation matrix to apply in projected space.
-     */
-    rotation(rotationMatrix3d) {
-      const upVector = this.upVector;
-      const lookAtPoint = this.lookAtPoint;
-      const eyePoint = this.eyePoint;
-      const orientation = this.orientation();
-      const inverseOrientation = G(orientation);
-      const orientProjection = T(rotationMatrix3d, orientation);
-      const oriented = T(inverseOrientation, orientProjection);
-      const newUpVector = $(oriented, upVector);
-      const offset = M(eyePoint, lookAtPoint);
-      const newoffset = $(oriented, offset);
-      const newEyePoint = p(lookAtPoint, newoffset);
-      const result = new Projector(newEyePoint, lookAtPoint, this.perspective, newUpVector);
-      return result;
-    }
-    distanceScale(atPoint) {
-      const toPoint = M(atPoint, this.eyePoint);
-      const distance = g(toPoint);
-      if (distance < EPSILON) {
-        return 1;
-      }
-      const scale = this.focusLength / distance;
-      return scale;
-    }
-    /** 3x3 3d rotation matrix based on xy offset adjusted by focuslength  */
-    XYOffsetRotation(startXY, endXY) {
-      const offset = M(endXY, startXY);
-      const [dx, dy] = offset;
-      const focusLength = this.focusLength;
-      const rotation = this.rotateYawPitch(-dx / focusLength, -dy / focusLength);
-      return rotation;
-    }
-    /* not used
-    rotateXY(startXY: tsvector.Vector, endXY: tsvector.Vector, projectionMatrix: tsvector.Matrix | null): Projector {
-        // Create a rotation matrix for the XY mouse offset
-        const offset = tsvector.vSub(endXY, startXY);
-        const [dx, dy] = offset;
-        const focusLength = this.focusLength;
-        //("Focus Length:", focusLength, "Offset:", offset);
-        //const affineRotation = OrbitRotation([dx / focusLength, dy / focusLength]);
-        const rotation = this.rotateYawPitch(dx / focusLength, dy / focusLength);
-        const affineRotation = tsvector.affine3d(rotation);
-        return this.rotate(affineRotation, projectionMatrix);
-    };
-    */
-    rotateYawPitch(pitch, yaw) {
-      const Myaw = J(-yaw);
-      const Mpitch = K(-pitch);
-      const rotated = T(Mpitch, Myaw);
-      return rotated;
-    }
-    /** Rotate the projection matrix by the given affine rotation matrix at the lookAtPoint.
-     * @param affineRotation - The affine rotation matrix to apply.
-     * @param projectionMatrix - Optional, if not provided, will use the current projection matrix.
-     */
-    /* not used ???
-    rotate(affineRotation: tsvector.Matrix, projectionMatrix: tsvector.Matrix | null = null): Projector {
-        if (projectionMatrix === null) {
-            if (this.projectionMatrix === null) {
-                this.getProjectionMatrix();
-            }
-            projectionMatrix = this.projectionMatrix;
-        }
-        // projectionMatrix is currently at the eyePoint
-        // Apply the rotation at the lookAtPoint and then translate back to the eyePoint
-        const shift = tsvector.vSub(this.eyePoint, this.lookAtPoint);
-        const translateToLookAt = tsvector.affine3d(null, shift);
-        const translated = tsvector.MMProduct(translateToLookAt, projectionMatrix!);
-        const rotated = tsvector.MMProduct(affineRotation, translated);
-        const invRotation = tsvector.MInverse(affineRotation);
-        const rotatedShiftAffine = tsvector.MvProduct(invRotation, affine3d(shift));
-        const rotatedShift = rotatedShiftAffine.slice(0, 3); // drop the last element
-        const translateBack = tsvector.affine3d(null, tsvector.vScale(-1, rotatedShift));
-        this.projectionMatrix = tsvector.MMProduct(translateBack, rotated);
-        return this;
-    };
-    */
-    orientation() {
-      if (this.projectionMatrix === null) {
-        this.getProjectionMatrix();
-      }
-      const projection2 = this.projectionMatrix;
-      return [
-        projection2[0].slice(0, 3),
-        projection2[1].slice(0, 3),
-        projection2[2].slice(0, 3)
-      ];
-    }
-    project(xyz) {
-      if (this.projectionMatrix === null) {
-        this.getProjectionMatrix();
-      }
-      const affine = affine3d(xyz);
-      const projected = $(this.projectionMatrix, affine);
-      projected[2] /= this.zscale;
-      const P2 = [projected[0] / projected[3], projected[1] / projected[3], projected[2] / projected[3]];
-      if (this.perspective) {
-        const scale = 1 / P2[2];
-        return [P2[0] * scale, P2[1] * scale, P2[2]];
-      } else {
-        return [P2[0], P2[1], P2[2]];
-      }
-    }
-  }
-  const projection = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
-    __proto__: null,
-    ProjectionMatrix,
-    Projector,
-    affine3d,
-    perpendicularComponent
   }, Symbol.toStringTag, { value: "Module" }));
   let Image$1 = class Image extends Rectangle {
     constructor(source, frame2, point, size = null, offset = [0, 0], scaled = false) {
