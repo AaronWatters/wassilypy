@@ -5,7 +5,15 @@ import importlib.resources
 __version__ = "0.1.0"
 
 
-from .frame import Diagram, Frame, wassily2d
+from .frame import (
+    Diagram, 
+    Frame, 
+    wassily2d,
+    swatch,
+    cube,
+    CubeView,
+    SwatchView,
+)
 
 def hello():
     """Return a hello world message."""

@@ -11,6 +11,7 @@ from abc import ABC, abstractmethod
 from . import marking
 from .marking import listiffy
 
+EPSILON = 1e-10
 
 async def wassily2d(width, height=None, link=True):
     diagram = Diagram(width, height)
@@ -20,7 +21,95 @@ async def wassily2d(width, height=None, link=True):
         await diagram.show()
     return diagram.mainFrame
 
+class SwatchView:
 
+    def __init__(self, pixelSize, modelSize, center=[0,0]):
+        self.pixelSize = pixelSize
+        self.modelSize = modelSize
+        self.center = center
+        self.diagram = Diagram(pixelSize, pixelSize)
+        self.diagram.call_when_started(self.start)
+
+    def start(self):
+        modelSize = self.modelSize
+        pixelSize = self.pixelSize
+        center = np.array(self.center)
+        model2 = modelSize / 2
+        #pixelOffset = np.array([pixel2, pixel2])
+        modelOffset = np.array([model2, model2])
+        fromMin = [0,0]
+        fromMax = [pixelSize, pixelSize]
+        toMin = center - modelOffset
+        toMax = center + modelOffset
+        mainFrame = self.diagram.mainFrame
+        swatchFrame = mainFrame.regionFrame(fromMin, fromMax, toMin, toMax)
+        self.frame = swatchFrame
+
+async def swatch(pixelSize, modelSize, center=[0,0], link=True):
+    view = SwatchView(pixelSize, modelSize, center)
+    if link:
+        await view.diagram.link()
+    else:
+        await view.diagram.show()
+    # frame should have been initialized upon start
+    return view.frame
+
+class CubeView:
+
+    def __init__(self, pixelSize, modelSize, modelCenter=[0,0,0], perspective=True, shrink=0.9):
+        self.pixelSize = pixelSize
+        self.modelSize = modelSize
+        self.modelCenter = modelCenter
+        self.perspective = perspective
+        self.shrink = shrink
+        self.diagram = Diagram(pixelSize, pixelSize)
+        self.diagram.call_when_started(self.start)
+
+    def start(self):
+        modelSize = self.modelSize
+        pixelSize = self.pixelSize
+        modelCenter = np.array(self.modelCenter)
+        eyeOffset = np.array([0, 0, -1.5 * modelSize])
+        eye = modelCenter + eyeOffset
+        lookAt = modelCenter
+        mainFrame = self.diagram.mainFrame
+        swatchWidth = pixelSize * self.shrink
+        model2 = modelSize / 2
+        swatchFrame = mainFrame.regionFrame(
+            [0,0],
+            [swatchWidth, swatchWidth],
+            modelCenter[0:2] - model2,
+            modelCenter[0:2] + model2)
+        cubeFrame = swatchFrame.frame3d(
+            eyePoint=eye,
+            lookAtPoint=lookAt,
+            perspective=self.perspective)
+        self.frame = cubeFrame
+
+
+async def cube(pixelSize, modelSize, modelCenter=[0,0,0], perspective=True, shrink=0.9, link=True):
+    view = CubeView(pixelSize, modelSize, modelCenter, perspective, shrink)
+    if link:
+        await view.diagram.link()
+    else:
+        await view.diagram.show()
+    # frame should have been initialized upon start
+    return view.frame
+
+'''
+async def cube(pixelSize, modelSize, modelCenter=[0,0,0], perspective=True, shrink=0.9):
+    eyeOffset = np.array([0, 0, -1.5 * modelSize])
+    modelCenter = np.array(modelCenter)
+    eye = modelCenter + eyeOffset
+    lookAt = modelCenter
+    swatchWidth = pixelSize * shrink
+    swatchFrame = await swatch(swatchWidth, modelSize, center=modelCenter[0:2])
+    print(eye, lookAt, perspective)
+    cubeFrame = swatchFrame.frame3d(
+        eyePoint=eye,
+        lookAtPoint=lookAt,
+        perspective=perspective)
+    return cubeFrame'''
 
 class Diagram(gz.jQueryComponent):
 
@@ -205,6 +294,16 @@ def force_uint8_array(x):
         raise TypeError("Expected bytes or numpy ndarray") 
 
 class Frame3d(marking.Styled):
+
+    def lookAt(self, lookAtPoint, epsilon=EPSILON):
+        lookAtPoint = listiffy(lookAtPoint)
+        return self.send_only("lookAt", lookAtPoint, epsilon)
+    
+    def lookFrom(self, eyePoint, upVector=None, epsilon=EPSILON):
+        eyePoint = listiffy(eyePoint)
+        if upVector is not None:
+            upVector = listiffy(upVector)
+        return self.send_only("lookFrom", eyePoint, upVector, epsilon)
     
     def orbit(self):
         return self.send_only("orbit")
