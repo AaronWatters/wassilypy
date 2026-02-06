@@ -49,7 +49,7 @@ async def solidDiagram(target = "icosahedron", onFrame=None):
         f = onFrame
     else:
         f = await cube(900, 8, modelCenter=center, perspective=True)
-    f.lookFrom(eyePoint=[-2,-1,-2.5])
+    f.lookFrom(eyePoint=[-2,-1,-4.5])
     f.clear()
     for face in target_faces:
         face_verts = [target_vertices[i] for i in face]
