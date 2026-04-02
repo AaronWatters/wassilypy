@@ -38,6 +38,14 @@ class Styled:
         args = (listiffy(arg) for arg in arguments)
         gz.do(self.js_reference[methodname](*args))
         return self
+    
+    def transition(self, durationSeconds):
+        myClassConstructor = self.__class__
+        jsTransitionCall = self.js_reference.transition(durationSeconds)
+        # JS side cache will uncache after the transition is collected on the python side.
+        softCache = self.on_diagram.cache(name=None, js_reference=jsTransitionCall, soft=True)
+        wrapper = myClassConstructor(softCache, self.on_diagram)
+        return wrapper
 
     def handleEvent(self, eventType, handlerOrNull=None):
         """
@@ -172,12 +180,6 @@ class Star(Styled):
 class Arrow(Styled):
     pass
 
-class Image3d(Styled):
-    pass
-
-class TextBox3d(Styled):
-    pass
-
 class Poly3d(Styled):
 
     def closed(self, boolean=True):
@@ -187,10 +189,42 @@ class Poly3d(Styled):
         return self.send_only("normalColored", defaultxyz, alpha)
 
 class Rect3d(Styled):
+    
+    def degrees(self, angle):
+        return self.send_only("degrees", angle)
+    
+    def resize(self, wh):
+        wh = listiffy(wh)
+        return self.send_only("resize", wh)
+    
+    def offsetBy(self, xy):
+        xy = listiffy(xy)
+        return self.send_only("offsetBy", xy)
+    
+    def scaling(self, boolean):
+        return self.send_only("scaling", boolean)
+    
+    def locateAt(self, xy):
+        xy = listiffy(xy)
+        return self.send_only("locateAt", xy)
+
+class Image3d(Rect3d):
+    pass
+
+class TextBox3d(Rect3d):
     pass
 
 class Line3d(Styled):
     pass
 
 class Circle3d(Styled):
-    pass
+
+    def scaling(self, boolean):
+        return self.send_only("scaling", boolean)
+    
+    def centered(self, xy):
+        xy = listiffy(xy)
+        return self.send_only("centered", xy)
+    
+    def resized(self, radius):
+        return self.send_only("resized", radius)
