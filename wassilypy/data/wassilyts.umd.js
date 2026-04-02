@@ -317,6 +317,7 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       }
       this.stroke = other.stroke;
       this.responsive = other.responsive;
+      return this;
     }
     /** Determine if the object is attached to a live frame.
      * @return True if the object is live, false otherwise.
@@ -505,9 +506,86 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       this.defunct = true;
       this.requestRedraw();
     }
+    clone() {
+      throw new Error("clone() not implemented for " + this.constructor.name);
+    }
+    interpolate(starting, ending, fraction) {
+      if (fraction < 0.5) {
+        this.styleLike(starting);
+      } else {
+        this.styleLike(ending);
+      }
+      return this;
+    }
+    interpolate_number(starting, ending, fraction) {
+      return starting + (ending - starting) * fraction;
+    }
+    interpolate_integer(starting, ending, fraction) {
+      return Math.round(this.interpolate_number(starting, ending, fraction));
+    }
+    interpolate_vector(starting, ending, fraction) {
+      return p(
+        starting,
+        v(fraction, M(ending, starting))
+      );
+    }
+    interpolate_vectors(starting, ending, fraction) {
+      if (starting.length !== ending.length) {
+        return this.interpolate_switch(starting, ending, fraction);
+      }
+      const result = [];
+      for (let i = 0; i < starting.length; i++) {
+        result.push(this.interpolate_vector(starting[i], ending[i], fraction));
+      }
+      return result;
+    }
+    interpolate_switch(starting, ending, fraction) {
+      if (fraction < 0.5) {
+        return starting;
+      } else {
+        return ending;
+      }
+    }
+    transition(durationSeconds) {
+      if (!this.onFrame) {
+        throw new Error("Object is not attached to a frame.");
+      }
+      const interpolation = new Interpolation(this, this.clone(), durationSeconds);
+      this.onFrame.diagram.addInterpolation(interpolation);
+      return interpolation.ending;
+    }
+  }
+  class Interpolation {
+    constructor(target, ending, durationSeconds) {
+      __publicField(this, "starting");
+      __publicField(this, "ending");
+      __publicField(this, "target");
+      __publicField(this, "duration");
+      __publicField(this, "startTime");
+      __publicField(this, "endTime");
+      this.target = target;
+      this.starting = target.clone();
+      this.ending = ending;
+      this.duration = durationSeconds * 1e3;
+      this.startTime = Date.now();
+      this.endTime = this.startTime + this.duration;
+    }
+    update(timestamp) {
+      const fraction = Math.min(1, Math.max(0, (timestamp - this.startTime) / this.duration));
+      this.target.interpolate(this.starting, this.ending, fraction);
+    }
+    is_complete(timestamp) {
+      const result = timestamp >= this.endTime;
+      if (result) {
+        this.starting.forget();
+        this.ending.forget();
+      }
+      return result;
+    }
   }
   const styled = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
     __proto__: null,
+    Interpolation,
     Styled
   }, Symbol.toStringTag, { value: "Module" }));
   class Marking extends Styled {
@@ -579,6 +657,18 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       this.center = center;
       this.radius = radius;
       this.scaled = scaled;
+    }
+    clone() {
+      const result = new Circle(this.onFrame, this.center, this.radius, this.scaled);
+      result.styleLike(this);
+      return result;
+    }
+    interpolate(starting, ending, fraction) {
+      super.interpolate(starting, ending, fraction);
+      this.center = this.interpolate_vector(starting.center, ending.center, fraction);
+      this.radius = this.interpolate_number(starting.radius, ending.radius, fraction);
+      this.scaled = this.interpolate_switch(starting.scaled, ending.scaled, fraction);
+      return this;
     }
     centerAt(position) {
       this.center = position;
@@ -800,6 +890,24 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       this.scaled = scaled;
       this.rotationDegrees = rotationDegrees;
     }
+    clone() {
+      const result = new Rectangle(this.onFrame, this.point, this.size, this.offset, this.scaled, this.rotationDegrees);
+      result.styleLike(this);
+      return result;
+    }
+    interpolate(starting, ending, fraction) {
+      super.interpolate(starting, ending, fraction);
+      this.point = this.interpolate_vector(starting.point, ending.point, fraction);
+      if (starting.size !== null && ending.size !== null) {
+        this.size = this.interpolate_vector(starting.size, ending.size, fraction);
+      } else {
+        this.size = this.interpolate_switch(starting.size, ending.size, fraction);
+      }
+      this.offset = this.interpolate_vector(starting.offset, ending.offset, fraction);
+      this.scaled = this.interpolate_switch(starting.scaled, ending.scaled, fraction);
+      this.rotationDegrees = this.interpolate_number(starting.rotationDegrees, ending.rotationDegrees, fraction);
+      return this;
+    }
     degrees(rotationDegrees) {
       this.rotationDegrees = rotationDegrees;
       this.requestRedraw();
@@ -973,6 +1081,17 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       this.end = end;
       this.stroked();
     }
+    clone() {
+      const result = new Line(this.onFrame, this.start, this.end);
+      result.styleLike(this);
+      return result;
+    }
+    interpolate(starting, ending, fraction) {
+      super.interpolate(starting, ending, fraction);
+      this.start = this.interpolate_vector(starting.start, ending.start, fraction);
+      this.end = this.interpolate_vector(starting.end, ending.end, fraction);
+      return this;
+    }
     startAt(position) {
       this.start = position;
       this.requestRedraw();
@@ -1017,6 +1136,16 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       __publicField(this, "close", true);
       this.points = points;
       this.stroked();
+    }
+    clone() {
+      const result = new Poly(this.onFrame, this.points);
+      result.styleLike(this);
+      return result;
+    }
+    interpolate(starting, ending, fraction) {
+      super.interpolate(starting, ending, fraction);
+      this.points = this.interpolate_vectors(starting.points, ending.points, fraction);
+      return this;
     }
     vertices(points) {
       this.points = points;
@@ -1390,6 +1519,7 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       this.end = end;
       this.stroked();
     }
+    // xxxx add methods to set start/end...
     projectTo2D() {
       const onFrame3d = this.onFrame3d;
       const startProj = onFrame3d.projection.project(this.start);
@@ -1834,13 +1964,31 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
     __proto__: null,
     Frame3d
   }, Symbol.toStringTag, { value: "Module" }));
-  let Image$1 = class Image extends Rectangle {
+  let Image$1 = class Image2 extends Rectangle {
     constructor(source, frame2, point, size = null, offset = [0, 0], scaled = false) {
       super(frame2, point, size, offset, scaled);
       __publicField(this, "source");
       __publicField(this, "awaitingLoad", false);
       this.source = source;
       this.checkCompletion(source);
+    }
+    setURL(url) {
+      const diagram2 = this.onFrame.diagram;
+      const newsource = diagram2.nameImageFromURL(url, url, false);
+      this.source = newsource;
+      this.checkCompletion(this.source);
+      return this;
+    }
+    clone() {
+      const result = new Image2(this.source, this.onFrame, this.point, this.size, this.offset, this.scaled);
+      result.styleLike(this);
+      return result;
+    }
+    interpolate(starting, ending, fraction) {
+      super.interpolate(starting, ending, fraction);
+      this.source = this.interpolate_switch(starting.source, ending.source, fraction);
+      this.checkCompletion(this.source);
+      return this;
     }
     async checkCompletion(image) {
       if (image.complete && image.naturalWidth !== 0) {
@@ -1920,6 +2068,21 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       this.alignment = alignment;
       this.shift = shift;
     }
+    clone() {
+      const result = new TextBox(this.text, this.onFrame, this.referencePoint, this.shift, this.alignment, this.background);
+      result.styleLike(this);
+      return result;
+    }
+    interpolate(starting, ending, fraction) {
+      super.interpolate(starting, ending, fraction);
+      this.text = this.interpolate_switch(starting.text, ending.text, fraction);
+      this.background = this.interpolate_switch(starting.background, ending.background, fraction);
+      this.referencePoint = this.interpolate_vector(starting.referencePoint, ending.referencePoint, fraction);
+      this.shift = this.interpolate_vector(starting.shift, ending.shift, fraction);
+      this.alignment = this.interpolate_switch(starting.alignment, ending.alignment, fraction);
+      this.valignment = this.interpolate_switch(starting.valignment, ending.valignment, fraction);
+      return this;
+    }
     // use the reference point for get/set operations
     getFramePoint() {
       return this.referencePoint;
@@ -1950,6 +2113,11 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
     }
     boxed(background) {
       this.background = background;
+      this.requestRedraw();
+      return this;
+    }
+    locateAt(position) {
+      this.setFramePoint(position);
       this.requestRedraw();
       return this;
     }
@@ -2041,6 +2209,10 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       this.setTranslation(this.framePoint);
       onFrame.addElement(this.assemblyFrame);
     }
+    forget() {
+      super.forget();
+      this.assemblyFrame.forget();
+    }
     // The prepare operation makes the assembly
     prepareForRedraw() {
       const assemblyFrame = this.assemblyFrame;
@@ -2083,11 +2255,32 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       __publicField(this, "innerRadius");
       __publicField(this, "outerRadius");
       __publicField(this, "rotationDegrees");
+      __publicField(this, "pointFactor");
+      this.center = center;
       this.numPoints = numPoints;
       this.innerRadius = innerRadius;
+      this.pointFactor = pointFactor;
       this.outerRadius = innerRadius * pointFactor;
       this.rotationDegrees = degrees;
       this.setTranslation(center);
+    }
+    rotateDegrees(rotationDegrees) {
+      this.rotationDegrees = rotationDegrees;
+      this.requestRedraw();
+      return this;
+    }
+    centerAt(position) {
+      debugger;
+      this.center = position;
+      this.setTranslation(position);
+      this.requestRedraw();
+      return this;
+    }
+    resize(innerRadius) {
+      this.innerRadius = innerRadius;
+      this.outerRadius = innerRadius * this.pointFactor;
+      this.requestRedraw();
+      return this;
     }
     assemble(onFrame) {
       const center = [0, 0];
@@ -2103,27 +2296,71 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       }
       const poly2 = onFrame.polygon(points);
       poly2.closed(true);
-      poly2.styleLike(this);
       poly2.filled();
+      poly2.styleLike(this);
+    }
+    clone() {
+      const result = new Star(this.onFrame, this.center, this.innerRadius, this.numPoints, this.outerRadius / this.innerRadius, this.rotationDegrees);
+      result.styleLike(this);
+      return result;
+    }
+    interpolate(starting, ending, fraction) {
+      super.interpolate(starting, ending, fraction);
+      this.center = this.interpolate_vector(starting.center, ending.center, fraction);
+      this.centerAt(this.center);
+      this.numPoints = this.interpolate_integer(starting.numPoints, ending.numPoints, fraction);
+      this.center = this.interpolate_vector(starting.center, ending.center, fraction);
+      this.innerRadius = this.interpolate_number(starting.innerRadius, ending.innerRadius, fraction);
+      this.outerRadius = this.interpolate_number(starting.outerRadius, ending.outerRadius, fraction);
+      this.rotationDegrees = this.interpolate_number(starting.rotationDegrees, ending.rotationDegrees, fraction);
+      return this;
     }
   }
   class Arrow extends Assembly {
     // fraction of length if tipLength is null
     constructor(onFrame, back, tip, tipLength = null, tipDegrees = 20, tipFactor = 0.1) {
       super(onFrame);
-      __publicField(this, "back");
-      __publicField(this, "tip");
-      __publicField(this, "vector");
+      __publicField(this, "back", [0, 0]);
+      __publicField(this, "tip", [0, 0]);
+      __publicField(this, "vector", [0, 0]);
       __publicField(this, "tipDegrees", 20);
       __publicField(this, "tipLength", 10);
       __publicField(this, "tipFactor", 0.1);
-      this.back = back;
-      this.tip = tip;
-      this.vector = M(tip, back);
       this.tipDegrees = tipDegrees;
       this.tipLength = tipLength;
       this.tipFactor = tipFactor;
+      this.setGeometry(back, tip);
+    }
+    clone() {
+      const result = new Arrow(this.onFrame, this.back, this.tip, this.tipLength, this.tipDegrees, this.tipFactor);
+      result.styleLike(this);
+      return result;
+    }
+    interpolate(starting, ending, fraction) {
+      super.interpolate(starting, ending, fraction);
+      this.back = this.interpolate_vector(starting.back, ending.back, fraction);
+      this.tip = this.interpolate_vector(starting.tip, ending.tip, fraction);
+      this.tipLength = this.interpolate_switch(starting.tipLength, ending.tipLength, fraction);
+      this.tipDegrees = this.interpolate_number(starting.tipDegrees, ending.tipDegrees, fraction);
+      this.tipFactor = this.interpolate_number(starting.tipFactor, ending.tipFactor, fraction);
+      this.setGeometry(this.back, this.tip);
+      return this;
+    }
+    setGeometry(back, tip) {
+      this.back = back;
+      this.tip = tip;
+      this.vector = M(tip, back);
       this.setTranslation(back);
+    }
+    startAt(position) {
+      this.setGeometry(position, this.tip);
+      this.requestRedraw();
+      return this;
+    }
+    endAt(position) {
+      this.setGeometry(this.back, position);
+      this.requestRedraw();
+      return this;
     }
     assemble(onFrame, epsilon = 1e-5) {
       const vecLength = g(this.vector);
@@ -2263,6 +2500,41 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
         }
       }
       return handled;
+    }
+    /** Return all responsive markings where the frame point for the marking
+    * lies in the path of any of the selecting markings.
+    * 
+    * @param selecting An array of markings to test for selection.
+    * @returns An array of markings that are selected by the selecting markings.
+    */
+    selected(selecting) {
+      if (!this.isLive()) {
+        throw new Error("Frame is not attached to a diagram.");
+      }
+      const diagram2 = this.diagram;
+      const ctx = diagram2.ctx;
+      const selectingPaths = selecting.map((s2) => s2.drawPath());
+      const result = [];
+      for (const element of this.drawOrder) {
+        if (element instanceof Marking && element.responsive) {
+          const pixel = element.getPixel();
+          const [x2, y2] = diagram2.toCanvas(pixel);
+          if (selectingPaths.some((path) => ctx.isPointInPath(path, x2, y2))) {
+            result.push(element);
+          }
+        }
+      }
+      return result;
+    }
+    /** Return names of responsive markings where the frame point for the marking 
+     * lies in the path of any of the selecting markings.
+     * This is a convenience method for external event handlers that cannot access the marking objects.
+     * 
+     * @param selecting An array of markings to test for selection.
+     * @returns An array of names of selected markings.
+     */
+    selectedNames(selecting) {
+      return this.selected(selecting).map((m2) => m2.objectName);
     }
     /** Return all responsive markings that are picked by the canvas coordinates, in reverse draw order (topmost first)
      * @internal
@@ -2444,6 +2716,15 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
     toPixel(xy) {
       return applyAffine(this.ModelToPixel, xy);
     }
+    /* commented until needed -- unused
+    scaleToPixelLength(modelVector: tsvector.Vector, length: number): tsvector.Vector {
+        const pixelOrigin = this.toPixel([0, 0]);
+        const pixelVector = tsvector.vSub(this.toPixel(modelVector), pixelOrigin);
+        const pixelLength = tsvector.vLength(pixelVector);
+        const scaleFactor = length / pixelLength
+        return tsvector.vScale(scaleFactor, modelVector);
+    };
+    */
     /** Convert from cartesian pixel space to model space
      * @param xy The cartesian pixel coordinates to convert.
      * @returns The model coordinates.
@@ -2452,6 +2733,13 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
     toModel(xy) {
       return applyAffine(this.pixelToModel, xy);
     }
+    /** Convert from canvas coordinates to model coordinates. */
+    /* commented for now -- unused.
+    canvasToModel(canvasxy: tsvector.Vector): tsvector.Vector {
+        const pixel = this.diagram.toCartesian(canvasxy);
+        return this.toModel(pixel);
+    };
+    */
     /** Create a frame for a subregion and record it. 
      * fromMinxy..fromMaxxy is the region in the current frame.
      * toMinxy..toMaxxy is the region in the new frame.
@@ -2464,6 +2752,13 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
     regionFrame(fromMinxy, fromMaxxy, toMinxy, toMaxxy) {
       const affine = regionMap(fromMinxy, fromMaxxy, toMinxy, toMaxxy);
       const result = new Frame(this.diagram, affine, this);
+      this.addElement(result);
+      return result;
+    }
+    /** Create an overlay frame with same geometry (used by lasso demo) */
+    overlayFrame() {
+      const identity2 = w(3);
+      const result = new Frame(this.diagram, identity2, this);
       this.addElement(result);
       return result;
     }
@@ -2730,6 +3025,8 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       __publicField(this, "watchedEvents", /* @__PURE__ */ new Set());
       // for external named access, keep track of named styled elements
       __publicField(this, "nameToStyled", /* @__PURE__ */ new Map());
+      // interpolations for animated effects
+      __publicField(this, "interpolations", []);
       this.container = domObject;
       this.width = width;
       this.height = height;
@@ -2770,6 +3067,16 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
         throw new Error(`Styled object name ${styled2.objectName} already exists in diagram.`);
       }
       n2s.set(styled2.objectName, styled2);
+    }
+    addInterpolation(interpolation) {
+      this.interpolations.push(interpolation);
+    }
+    doInterpolations() {
+      const now = Date.now();
+      this.interpolations = this.interpolations.filter((interp) => {
+        interp.update(now);
+        return !interp.is_complete(now);
+      });
     }
     /** Delete a styled object from the diagram's name registry.
      * @param styled The styled object to delete
@@ -2851,12 +3158,13 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
       if (!replace) {
         const existing = this.nameToImage.get(name2);
         if (existing !== void 0) {
-          return this;
+          return existing;
         }
       }
       const image = new Image();
       image.src = url;
       this.nameImage(name2, image);
+      return image;
     }
     /**
      * Name an image from PNG binary data.
@@ -2891,6 +3199,7 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
     draw() {
       try {
         this.disableRedraws();
+        this.doInterpolations();
         this.clear();
         this.mainFrame.prepareForRedraw();
         this.mainFrame.draw();
@@ -2901,6 +3210,9 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
         const border = this.deferred_fit_border;
         this.fit(border);
         this.deferred_fit_border = null;
+        this.requestRedraw();
+      }
+      if (this.interpolations.length > 0) {
         this.requestRedraw();
       }
     }
@@ -3079,7 +3391,54 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
     drawOn,
     imageFromPNGBytes
   }, Symbol.toStringTag, { value: "Module" }));
+  function ticklist(lowerbound, upperbound, maxticks) {
+    if (maxticks < 2) {
+      throw new Error("maxticks must be >= 2");
+    }
+    if (lowerbound === upperbound) {
+      return [lowerbound, 0, 0, [lowerbound]];
+    }
+    const span = upperbound - lowerbound;
+    if (span <= 0) {
+      throw new Error("upperbound must be greater than lowerbound");
+    }
+    const epsilon = span * 1e-12;
+    const rawStep = span / (maxticks - 1);
+    const niceStep = niceNumber(rawStep);
+    const anchor = Math.floor(lowerbound / niceStep) * niceStep;
+    const ticks = [];
+    let t = anchor;
+    const maxIter = 1e4;
+    for (let i = 0; i < maxIter; i++) {
+      if (t > upperbound + epsilon) break;
+      if (t >= lowerbound - epsilon) {
+        ticks.push(roundTo(t, niceStep));
+      }
+      t += niceStep;
+    }
+    const offset = Math.ceil((lowerbound - anchor) / niceStep);
+    return [anchor, niceStep, offset, ticks];
+  }
+  function niceNumber(x2) {
+    const exp = Math.floor(Math.log10(x2));
+    const f = x2 / Math.pow(10, exp);
+    let nf;
+    if (f <= 1) nf = 1;
+    else if (f <= 2) nf = 2;
+    else if (f <= 5) nf = 5;
+    else nf = 10;
+    return nf * Math.pow(10, exp);
+  }
+  function roundTo(x2, step) {
+    const precision = Math.max(0, -Math.floor(Math.log10(step)) + 2);
+    return Number(x2.toFixed(precision));
+  }
+  const calculations = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+    __proto__: null,
+    ticklist
+  }, Symbol.toStringTag, { value: "Module" }));
   const name = "wassilyjs";
+  exports2.calculations = calculations;
   exports2.circle = circle;
   exports2.conveniences = conveniences;
   exports2.cube = cube;
