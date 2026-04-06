@@ -13,7 +13,10 @@ async def demo():
     c.colored("blue").filled()
     a = f.arrow(center, [300, 150], tipLength=30).colored("red").linedWidth(5)
     t = f.textBox([200, 270], "Hello, Wassily!").font("20pt Arial").colored("navyblue").aligned("center")
+    c2 = f.circle([100, 50], 30).colored("cyan").filled()
     f.fit(border=20)
+    s.transition(3).colored("purple").linedWidth(10)
+    c2.transition(3).colored("magenta").linedWidth(5).centerAt(center).resize(10)
     return f
 
 if __name__ == "__main__":
