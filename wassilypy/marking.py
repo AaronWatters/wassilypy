@@ -3,7 +3,7 @@
 Proxy classes for marking objects in a diagram
 """
 
-from typing import Any, Callable, Optional, TypeVar, overload
+from typing import Any, Callable, Optional, TypeVar, Union, overload
 
 import H5Gizmos as gz
 import numpy as np
@@ -52,7 +52,7 @@ class Styled:
             self,
             methodname: str,
             constructor: Optional[Callable[[Any, Any], TWrapped]] = None,
-            *arguments: Any) -> "Styled":
+            *arguments: Any) -> Union["Styled", TWrapped]:
         args = (listiffy(arg) for arg in arguments)
         js_ref = self.js_reference[methodname](*args)
         prefix = constructor.__name__ if constructor else "wassilypy"
