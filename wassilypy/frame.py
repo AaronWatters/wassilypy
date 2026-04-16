@@ -3,17 +3,23 @@
 Wrapping wassilyjs frames.
 """
 
+from typing import Any, Callable, Optional, TypeVar, overload
+
 import H5Gizmos as gz
 import numpy as np
 import importlib.resources
 import os
-from abc import ABC, abstractmethod
 from . import marking
 from .marking import listiffy
 
 EPSILON = 1e-10
+TWrapped = TypeVar("TWrapped", bound=marking.Styled)
 
-async def wassily2d(width, height=None, link=True):
+
+async def wassily2d(
+        width: float,
+        height: Optional[float] = None,
+        link: bool = True) -> "Frame":
     diagram = Diagram(width, height)
     if link:
         await diagram.link()
@@ -23,14 +29,18 @@ async def wassily2d(width, height=None, link=True):
 
 class SwatchView:
 
-    def __init__(self, pixelSize, modelSize, center=[0,0]):
+    def __init__(
+            self,
+            pixelSize: float,
+            modelSize: float,
+            center: Any = [0,0]) -> None:
         self.pixelSize = pixelSize
         self.modelSize = modelSize
         self.center = center
         self.diagram = Diagram(pixelSize, pixelSize)
         self.diagram.call_when_started(self.start)
 
-    def start(self):
+    def start(self) -> None:
         modelSize = self.modelSize
         pixelSize = self.pixelSize
         center = np.array(self.center)
@@ -45,7 +55,11 @@ class SwatchView:
         swatchFrame = mainFrame.regionFrame(fromMin, fromMax, toMin, toMax)
         self.frame = swatchFrame
 
-async def swatch(pixelSize, modelSize, center=[0,0], link=True):
+async def swatch(
+        pixelSize: float,
+        modelSize: float,
+        center: Any = [0,0],
+        link: bool = True) -> "Frame":
     view = SwatchView(pixelSize, modelSize, center)
     if link:
         await view.diagram.link()
@@ -56,7 +70,13 @@ async def swatch(pixelSize, modelSize, center=[0,0], link=True):
 
 class CubeView:
 
-    def __init__(self, pixelSize, modelSize, modelCenter=[0,0,0], perspective=True, shrink=0.9):
+    def __init__(
+            self,
+            pixelSize: float,
+            modelSize: float,
+            modelCenter: Any = [0,0,0],
+            perspective: bool = True,
+            shrink: float = 0.9) -> None:
         self.pixelSize = pixelSize
         self.modelSize = modelSize
         self.modelCenter = modelCenter
@@ -65,7 +85,7 @@ class CubeView:
         self.diagram = Diagram(pixelSize, pixelSize)
         self.diagram.call_when_started(self.start)
 
-    def start(self):
+    def start(self) -> None:
         modelSize = self.modelSize
         pixelSize = self.pixelSize
         modelCenter = np.array(self.modelCenter)
@@ -87,7 +107,13 @@ class CubeView:
         self.frame = cubeFrame
 
 
-async def cube(pixelSize, modelSize, modelCenter=[0,0,0], perspective=True, shrink=0.9, link=True):
+async def cube(
+        pixelSize: float,
+        modelSize: float,
+        modelCenter: Any = [0,0,0],
+        perspective: bool = True,
+        shrink: float = 0.9,
+        link: bool = True) -> "Frame3d":
     view = CubeView(pixelSize, modelSize, modelCenter, perspective, shrink)
     if link:
         await view.diagram.link()
@@ -113,7 +139,7 @@ async def cube(pixelSize, modelSize, modelCenter=[0,0,0], perspective=True, shri
 
 class Diagram(gz.jQueryComponent):
 
-    def __init__(self, width, height=None):
+    def __init__(self, width: float, height: Optional[float] = None) -> None:
         tag = "<div/>"
         super().__init__(tag)
         if height is None:
@@ -124,7 +150,7 @@ class Diagram(gz.jQueryComponent):
         assert os.path.isfile(js_path)
         self.js_file(js_path)
 
-    def configure_jQuery_element(self, element):
+    def configure_jQuery_element(self, element: Any) -> None:
         super().configure_jQuery_element(element)
         domdiv = element[0]
         wassilyts = self.window.wassilyts
@@ -138,10 +164,10 @@ class Diagram(gz.jQueryComponent):
         self.js_diagram = self.cache("diagram", self.js_frame.diagram)
         gz.do(console.log("diagram", self.js_diagram))
 
-    def styledRef(self, styled_name):
+    def styledRef(self, styled_name: str) -> Any:
         return self.js_diagram.getStyledByName(styled_name)
     
-    def wrapNamed(self, js_ref, prefix="wassilypy"):
+    def wrapNamed(self, js_ref: Any, prefix: str = "wassilypy") -> Any:
         new_id = gz.new_identifier(prefix)
         gz.do(js_ref.rename(new_id))
         return self.styledRef(new_id)
@@ -149,24 +175,24 @@ class Diagram(gz.jQueryComponent):
 
 class Frame(marking.Styled):
     
-    def __init__(self, js_reference, on_diagram):
+    def __init__(self, js_reference: Any, on_diagram: Any) -> None:
         super().__init__(js_reference, on_diagram)
 
-    def clear(self):
+    def clear(self) -> "Frame":
         return self.send_only("clear")
 
-    def fit(self, border=0):
+    def fit(self, border: float = 0) -> "Frame":
         return self.send_only("fit", border)
 
-    def setAffine(self, listMatrix):
+    def setAffine(self, listMatrix: Any) -> "Frame":
         listMatrix = listiffy(listMatrix)
         return self.send_only("setAffine", listMatrix)
     
     def regionFrame(self,
-                    fromMinxy,
-                    fromMaxxy,
-                    toMinxy,
-                    toMaxxy,):
+                    fromMinxy: Any,
+                    fromMaxxy: Any,
+                    toMinxy: Any,
+                    toMaxxy: Any) -> "Frame":
         fromMinxy = listiffy(fromMinxy)
         fromMaxxy = listiffy(fromMaxxy)
         toMinxy = listiffy(toMinxy)
@@ -178,10 +204,10 @@ class Frame(marking.Styled):
                                toMaxxy)
     
     def frame3d(self,
-                eyePoint,
-                lookAtPoint,
-                perspective=True,
-                upVector=None):
+                eyePoint: Any,
+                lookAtPoint: Any,
+                perspective: bool = True,
+                upVector: Any = None) -> "Frame3d":
         eyePoint = listiffy(eyePoint)
         lookAtPoint = listiffy(lookAtPoint)
         if upVector is not None:
@@ -189,100 +215,160 @@ class Frame(marking.Styled):
         return self.wrapResult("frame3d", Frame3d,
                                eyePoint,
                                lookAtPoint,
-                               perspective,
-                               upVector)
+                                perspective,
+                                upVector)
     
-    def getStyledByName(self, styled_name, constructor=None):
+    @overload
+    def getStyledByName(
+            self,
+            styled_name: str,
+            constructor: None = None) -> marking.Styled:
+        ...
+
+    @overload
+    def getStyledByName(
+            self,
+            styled_name: str,
+            constructor: Callable[[Any, Any], TWrapped]) -> TWrapped:
+        ...
+
+    def getStyledByName(
+            self,
+            styled_name: str,
+            constructor: Optional[Callable[[Any, Any], TWrapped]] = None
+            ) -> marking.Styled:
         if constructor is None:
             constructor = marking.Styled
         return self.wrapResult("getStyledByName", constructor, styled_name)  
     
-    def nameImageFromURL(self, name, url):
+    def nameImageFromURL(self, name: str, url: str) -> "Frame":
         return self.send_only("nameImageFromURL", name, url)
 
-    def pauseRedraw(self):
+    def pauseRedraw(self) -> "Frame":
         return self.send_only("pauseRedraw")
 
-    def resumeRedraw(self):
+    def resumeRedraw(self) -> "Frame":
         return self.send_only("resumeRedraw")
 
-    def nameImageFromPNGData(self, name, png_data):
+    def nameImageFromPNGData(self, name: str, png_data: Any) -> "Frame":
         """
         name a PNG encoded binary image from raw data.
         """
         png_data = force_uint8_array(png_data)
         return self.send_only("nameImageFromPNGData", name, png_data)
 
-    def pngImage(self, point, pngdata, size=None, offset=[0,0], scaled=False):
+    def pngImage(
+            self,
+            point: Any,
+            pngdata: Any,
+            size: Any = None,
+            offset: Any = [0,0],
+            scaled: bool = False) -> marking.Image:
         pngdata = force_uint8_array(pngdata)
         return self.wrapResult(
             "pngImage", marking.Image,
             point, pngdata, size, offset, scaled)
     
-    def namedImage(self, point, name, size=None, offset=[0,0], scaled=False):
+    def namedImage(
+            self,
+            point: Any,
+            name: str,
+            size: Any = None,
+            offset: Any = [0,0],
+            scaled: bool = False) -> marking.Image:
         return self.wrapResult(
             "namedImage", marking.Image,
-           point, name, size, offset, scaled)
+            point, name, size, offset, scaled)
     
-    def line(self, start, end):
+    def line(self, start: Any, end: Any) -> marking.Line:
         return self.wrapResult("line", marking.Line, start, end)
     
-    def dot(self, center, radius, scaled=False):
+    def dot(
+            self,
+            center: Any,
+            radius: float,
+            scaled: bool = False) -> marking.Circle:
         return self.wrapResult("dot", marking.Circle, center, radius, scaled)
     
-    def circle(self, center, radius, scaled=True):
+    def circle(
+            self,
+            center: Any,
+            radius: float,
+            scaled: bool = True) -> marking.Circle:
         return self.wrapResult("circle", marking.Circle, center, radius, scaled)
     
-    def rect(self, point, size, offset=[0,0], scaled=True, rotationDegrees=0):
+    def rect(
+            self,
+            point: Any,
+            size: Any,
+            offset: Any = [0,0],
+            scaled: bool = True,
+            rotationDegrees: float = 0) -> marking.Rect:
         return self.wrapResult(
             "rect", marking.Rect, 
             point, size, offset, scaled, rotationDegrees)
     
-    def box(self, point, size, offset=[0,0], scaled=False):
+    def box(
+            self,
+            point: Any,
+            size: Any,
+            offset: Any = [0,0],
+            scaled: bool = False) -> marking.Rect:
         return self.wrapResult(
             "box", marking.Rect, 
             point, size, offset, scaled)
     
-    def square(self, point, side, offset=[0,0], scaled=False):
+    def square(
+            self,
+            point: Any,
+            side: float,
+            offset: Any = [0,0],
+            scaled: bool = False) -> marking.Rect:
         size = [side, side]
         return self.wrapResult(
             "square", marking.Rect, 
             point, size, offset, scaled)
     
-    def polyline(self, points):
+    def polyline(self, points: Any) -> marking.Poly:
         return self.wrapResult("polyline", marking.Poly, points)
     
-    def polygon(self, points):
+    def polygon(self, points: Any) -> marking.Poly:
         return self.wrapResult("polygon", marking.Poly, points).filled().closed()
     
-    def textBox(self, point, text, shift=[0,0], alignment="left", background=None):
+    def textBox(
+            self,
+            point: Any,
+            text: str,
+            shift: Any = [0,0],
+            alignment: str = "left",
+            background: Any = None) -> marking.TextBox:
         return self.wrapResult(
             "textBox", marking.TextBox,
             point, text, shift, alignment, background)
         
     def star(
             self,
-            center,
-            innerRadius,
-            numPoints=5,
-            pointFactor=2.0,
-            degrees=0):
+            center: Any,
+            innerRadius: float,
+            numPoints: int = 5,
+            pointFactor: float = 2.0,
+            degrees: float = 0) -> marking.Star:
         return self.wrapResult(
             "star", marking.Star,
             center, innerRadius, numPoints, pointFactor, degrees)
     
     def arrow(
             self,
-            back,
-            tip,
-            tipDegrees=30,
-            tipLength=None,
-            tipFactor=0.1):
+            back: Any,
+            tip: Any,
+            tipDegrees: float = 30,
+            tipLength: Optional[float] = None,
+            tipFactor: float = 0.1) -> marking.Arrow:
         return self.wrapResult(
             "arrow", marking.Arrow,
             back, tip, tipDegrees, tipLength, tipFactor)
 
-def force_uint8_array(x):
+def force_uint8_array(x: Any) -> np.ndarray:
     if isinstance(x, np.ndarray):
         if x.dtype != np.uint8:
             return x.astype(np.uint8)
@@ -295,51 +381,73 @@ def force_uint8_array(x):
 
 class Frame3d(marking.Styled):
 
-    def lookAt(self, lookAtPoint, epsilon=EPSILON):
+    def lookAt(self, lookAtPoint: Any, epsilon: float = EPSILON) -> "Frame3d":
         lookAtPoint = listiffy(lookAtPoint)
         return self.send_only("lookAt", lookAtPoint, epsilon)
     
-    def lookFrom(self, eyePoint, upVector=None, epsilon=EPSILON):
+    def lookFrom(
+            self,
+            eyePoint: Any,
+            upVector: Any = None,
+            epsilon: float = EPSILON) -> "Frame3d":
         eyePoint = listiffy(eyePoint)
         if upVector is not None:
             upVector = listiffy(upVector)
         return self.send_only("lookFrom", eyePoint, upVector, epsilon)
     
-    def orbit(self):
+    def orbit(self) -> "Frame3d":
         return self.send_only("orbit")
     
-    def clear(self):
+    def clear(self) -> "Frame3d":
         return self.send_only("clear")
     
-    def fit(self, border=0):
+    def fit(self, border: float = 0) -> "Frame3d":
         return self.send_only("fit", border)
     
-    def nameImageFromURL(self, name, url):
+    def nameImageFromURL(self, name: str, url: str) -> "Frame3d":
         return self.send_only("nameImageFromURL", name, url)
     
-    def imageFromURL(self, point3d, url, size=None, offset=[0,0], scaled=False):
+    def imageFromURL(
+            self,
+            point3d: Any,
+            url: str,
+            size: Any = None,
+            offset: Any = [0,0],
+            scaled: bool = False) -> marking.Image3d:
         return self.wrapResult(
             "imageFromURL", marking.Image3d,
             point3d, url, size, offset, scaled)
     
-    def namedImage(self, point3d, name, size=None, offset=[0,0], scaled=False):
+    def namedImage(
+            self,
+            point3d: Any,
+            name: str,
+            size: Any = None,
+            offset: Any = [0,0],
+            scaled: bool = False) -> marking.Image3d:
         return self.wrapResult(
             "namedImage", marking.Image3d,
             point3d, name, size, offset, scaled)
 
-    def textBox(self, point3d, text, shift=[0,0], alignment="left", background=None):
+    def textBox(
+            self,
+            point3d: Any,
+            text: str,
+            shift: Any = [0,0],
+            alignment: str = "left",
+            background: Any = None) -> marking.TextBox3d:
         return self.wrapResult(
             "textBox", marking.TextBox3d,
             point3d, text, shift, alignment, background)
     
-    def line(self, start3d, end3d):
+    def line(self, start3d: Any, end3d: Any) -> marking.Line3d:
         return self.wrapResult("line", marking.Line3d, start3d, end3d)
     
-    def polygon(self, points3d):
+    def polygon(self, points3d: Any) -> marking.Poly3d:
         return self.wrapResult("polygon", marking.Poly3d, points3d)
     
-    def polyline(self, points3d):
+    def polyline(self, points3d: Any) -> marking.Poly3d:
         return self.wrapResult("polyline", marking.Poly3d, points3d)
     
-    def circle(self, center3d, radius):
+    def circle(self, center3d: Any, radius: float) -> marking.Circle3d:
         return self.wrapResult("circle", marking.Circle3d, center3d, radius)
