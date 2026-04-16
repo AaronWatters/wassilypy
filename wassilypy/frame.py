@@ -24,8 +24,8 @@ async def wassily2d(
     
     Args:
         width (float): To Be Filled In.
-        height (optional) (Optional[float]): To Be Filled In.
-        link (optional) (bool): To Be Filled In.
+        height (Optional[float], optional): To Be Filled In.
+        link (bool, optional): To Be Filled In.
     
     Returns:
         'Frame': To Be Filled In.
@@ -50,7 +50,7 @@ class SwatchView:
         Args:
             pixelSize (float): To Be Filled In.
             modelSize (float): To Be Filled In.
-            center (optional) (Any): To Be Filled In.
+            center (Any, optional): To Be Filled In.
         """
         self.pixelSize = pixelSize
         self.modelSize = modelSize
@@ -85,8 +85,8 @@ async def swatch(
     Args:
         pixelSize (float): To Be Filled In.
         modelSize (float): To Be Filled In.
-        center (optional) (Any): To Be Filled In.
-        link (optional) (bool): To Be Filled In.
+        center (Any, optional): To Be Filled In.
+        link (bool, optional): To Be Filled In.
     
     Returns:
         'Frame': To Be Filled In.
@@ -114,9 +114,9 @@ class CubeView:
         Args:
             pixelSize (float): To Be Filled In.
             modelSize (float): To Be Filled In.
-            modelCenter (optional) (Any): To Be Filled In.
-            perspective (optional) (bool): To Be Filled In.
-            shrink (optional) (float): To Be Filled In.
+            modelCenter (Any, optional): To Be Filled In.
+            perspective (bool, optional): To Be Filled In.
+            shrink (float, optional): To Be Filled In.
         """
         self.pixelSize = pixelSize
         self.modelSize = modelSize
@@ -162,10 +162,10 @@ async def cube(
     Args:
         pixelSize (float): To Be Filled In.
         modelSize (float): To Be Filled In.
-        modelCenter (optional) (Any): To Be Filled In.
-        perspective (optional) (bool): To Be Filled In.
-        shrink (optional) (float): To Be Filled In.
-        link (optional) (bool): To Be Filled In.
+        modelCenter (Any, optional): To Be Filled In.
+        perspective (bool, optional): To Be Filled In.
+        shrink (float, optional): To Be Filled In.
+        link (bool, optional): To Be Filled In.
     
     Returns:
         'Frame3d': To Be Filled In.
@@ -201,7 +201,7 @@ class Diagram(gz.jQueryComponent):
         
         Args:
             width (float): To Be Filled In.
-            height (optional) (Optional[float]): To Be Filled In.
+            height (Optional[float], optional): To Be Filled In.
         """
         tag = "<div/>"
         super().__init__(tag)
@@ -248,7 +248,7 @@ class Diagram(gz.jQueryComponent):
         
         Args:
             js_ref (Any): To Be Filled In.
-            prefix (optional) (str): To Be Filled In.
+            prefix (str, optional): To Be Filled In.
         
         Returns:
             Any: To Be Filled In.
@@ -282,7 +282,7 @@ class Frame(marking.Styled):
         """To Be Filled In.
         
         Args:
-            border (optional) (float): To Be Filled In.
+            border (float, optional): To Be Filled In.
         
         Returns:
             'Frame': To Be Filled In.
@@ -337,8 +337,8 @@ class Frame(marking.Styled):
         Args:
             eyePoint (Any): To Be Filled In.
             lookAtPoint (Any): To Be Filled In.
-            perspective (optional) (bool): To Be Filled In.
-            upVector (optional) (Any): To Be Filled In.
+            perspective (bool, optional): To Be Filled In.
+            upVector (Any, optional): To Be Filled In.
         
         Returns:
             'Frame3d': To Be Filled In.
@@ -362,7 +362,7 @@ class Frame(marking.Styled):
         
         Args:
             styled_name (str): To Be Filled In.
-            constructor (optional) (None): To Be Filled In.
+            constructor (None, optional): To Be Filled In.
         
         Returns:
             marking.Styled: To Be Filled In.
@@ -394,7 +394,7 @@ class Frame(marking.Styled):
         
         Args:
             styled_name (str): To Be Filled In.
-            constructor (optional) (Optional[Callable[[Any, Any], TWrapped]]): To Be Filled In.
+            constructor (Optional[Callable[[Any, Any], TWrapped]], optional): To Be Filled In.
         
         Returns:
             marking.Styled: To Be Filled In.
@@ -456,9 +456,9 @@ class Frame(marking.Styled):
         Args:
             point (Any): To Be Filled In.
             pngdata (Any): To Be Filled In.
-            size (optional) (Any): To Be Filled In.
-            offset (optional) (Any): To Be Filled In.
-            scaled (optional) (bool): To Be Filled In.
+            size (Any, optional): To Be Filled In.
+            offset (Any, optional): To Be Filled In.
+            scaled (bool, optional): To Be Filled In.
         
         Returns:
             marking.Image: To Be Filled In.
@@ -480,9 +480,9 @@ class Frame(marking.Styled):
         Args:
             point (Any): To Be Filled In.
             name (str): To Be Filled In.
-            size (optional) (Any): To Be Filled In.
-            offset (optional) (Any): To Be Filled In.
-            scaled (optional) (bool): To Be Filled In.
+            size (Any, optional): To Be Filled In.
+            offset (Any, optional): To Be Filled In.
+            scaled (bool, optional): To Be Filled In.
         
         Returns:
             marking.Image: To Be Filled In.
@@ -513,7 +513,7 @@ class Frame(marking.Styled):
         Args:
             center (Any): To Be Filled In.
             radius (float): To Be Filled In.
-            scaled (optional) (bool): To Be Filled In.
+            scaled (bool, optional): To Be Filled In.
         
         Returns:
             marking.Circle: To Be Filled In.
@@ -530,7 +530,7 @@ class Frame(marking.Styled):
         Args:
             center (Any): To Be Filled In.
             radius (float): To Be Filled In.
-            scaled (optional) (bool): To Be Filled In.
+            scaled (bool, optional): To Be Filled In.
         
         Returns:
             marking.Circle: To Be Filled In.
@@ -549,9 +549,9 @@ class Frame(marking.Styled):
         Args:
             point (Any): To Be Filled In.
             size (Any): To Be Filled In.
-            offset (optional) (Any): To Be Filled In.
-            scaled (optional) (bool): To Be Filled In.
-            rotationDegrees (optional) (float): To Be Filled In.
+            offset (Any, optional): To Be Filled In.
+            scaled (bool, optional): To Be Filled In.
+            rotationDegrees (float, optional): To Be Filled In.
         
         Returns:
             marking.Rect: To Be Filled In.
@@ -571,8 +571,8 @@ class Frame(marking.Styled):
         Args:
             point (Any): To Be Filled In.
             size (Any): To Be Filled In.
-            offset (optional) (Any): To Be Filled In.
-            scaled (optional) (bool): To Be Filled In.
+            offset (Any, optional): To Be Filled In.
+            scaled (bool, optional): To Be Filled In.
         
         Returns:
             marking.Rect: To Be Filled In.
@@ -592,8 +592,8 @@ class Frame(marking.Styled):
         Args:
             point (Any): To Be Filled In.
             side (float): To Be Filled In.
-            offset (optional) (Any): To Be Filled In.
-            scaled (optional) (bool): To Be Filled In.
+            offset (Any, optional): To Be Filled In.
+            scaled (bool, optional): To Be Filled In.
         
         Returns:
             marking.Rect: To Be Filled In.
@@ -637,9 +637,9 @@ class Frame(marking.Styled):
         Args:
             point (Any): To Be Filled In.
             text (str): To Be Filled In.
-            shift (optional) (Any): To Be Filled In.
-            alignment (optional) (str): To Be Filled In.
-            background (optional) (Any): To Be Filled In.
+            shift (Any, optional): To Be Filled In.
+            alignment (str, optional): To Be Filled In.
+            background (Any, optional): To Be Filled In.
         
         Returns:
             marking.TextBox: To Be Filled In.
@@ -660,9 +660,9 @@ class Frame(marking.Styled):
         Args:
             center (Any): To Be Filled In.
             innerRadius (float): To Be Filled In.
-            numPoints (optional) (int): To Be Filled In.
-            pointFactor (optional) (float): To Be Filled In.
-            degrees (optional) (float): To Be Filled In.
+            numPoints (int, optional): To Be Filled In.
+            pointFactor (float, optional): To Be Filled In.
+            degrees (float, optional): To Be Filled In.
         
         Returns:
             marking.Star: To Be Filled In.
@@ -683,9 +683,9 @@ class Frame(marking.Styled):
         Args:
             back (Any): To Be Filled In.
             tip (Any): To Be Filled In.
-            tipDegrees (optional) (float): To Be Filled In.
-            tipLength (optional) (Optional[float]): To Be Filled In.
-            tipFactor (optional) (float): To Be Filled In.
+            tipDegrees (float, optional): To Be Filled In.
+            tipLength (Optional[float], optional): To Be Filled In.
+            tipFactor (float, optional): To Be Filled In.
         
         Returns:
             marking.Arrow: To Be Filled In.
@@ -721,7 +721,7 @@ class Frame3d(marking.Styled):
         
         Args:
             lookAtPoint (Any): To Be Filled In.
-            epsilon (optional) (float): To Be Filled In.
+            epsilon (float, optional): To Be Filled In.
         
         Returns:
             'Frame3d': To Be Filled In.
@@ -738,8 +738,8 @@ class Frame3d(marking.Styled):
         
         Args:
             eyePoint (Any): To Be Filled In.
-            upVector (optional) (Any): To Be Filled In.
-            epsilon (optional) (float): To Be Filled In.
+            upVector (Any, optional): To Be Filled In.
+            epsilon (float, optional): To Be Filled In.
         
         Returns:
             'Frame3d': To Be Filled In.
@@ -769,7 +769,7 @@ class Frame3d(marking.Styled):
         """To Be Filled In.
         
         Args:
-            border (optional) (float): To Be Filled In.
+            border (float, optional): To Be Filled In.
         
         Returns:
             'Frame3d': To Be Filled In.
@@ -800,9 +800,9 @@ class Frame3d(marking.Styled):
         Args:
             point3d (Any): To Be Filled In.
             url (str): To Be Filled In.
-            size (optional) (Any): To Be Filled In.
-            offset (optional) (Any): To Be Filled In.
-            scaled (optional) (bool): To Be Filled In.
+            size (Any, optional): To Be Filled In.
+            offset (Any, optional): To Be Filled In.
+            scaled (bool, optional): To Be Filled In.
         
         Returns:
             marking.Image3d: To Be Filled In.
@@ -823,9 +823,9 @@ class Frame3d(marking.Styled):
         Args:
             point3d (Any): To Be Filled In.
             name (str): To Be Filled In.
-            size (optional) (Any): To Be Filled In.
-            offset (optional) (Any): To Be Filled In.
-            scaled (optional) (bool): To Be Filled In.
+            size (Any, optional): To Be Filled In.
+            offset (Any, optional): To Be Filled In.
+            scaled (bool, optional): To Be Filled In.
         
         Returns:
             marking.Image3d: To Be Filled In.
@@ -846,9 +846,9 @@ class Frame3d(marking.Styled):
         Args:
             point3d (Any): To Be Filled In.
             text (str): To Be Filled In.
-            shift (optional) (Any): To Be Filled In.
-            alignment (optional) (str): To Be Filled In.
-            background (optional) (Any): To Be Filled In.
+            shift (Any, optional): To Be Filled In.
+            alignment (str, optional): To Be Filled In.
+            background (Any, optional): To Be Filled In.
         
         Returns:
             marking.TextBox3d: To Be Filled In.

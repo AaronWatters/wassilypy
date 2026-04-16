@@ -65,7 +65,7 @@ class Styled:
         
         Args:
             methodname (str): To Be Filled In.
-            constructor (optional) (None): To Be Filled In.
+            constructor (None, optional): To Be Filled In.
             *arguments (Any): To Be Filled In.
         
         Returns:
@@ -100,7 +100,7 @@ class Styled:
         
         Args:
             methodname (str): To Be Filled In.
-            constructor (optional) (Optional[Callable[[Any, Any], TWrapped]]): To Be Filled In.
+            constructor (Optional[Callable[[Any, Any], TWrapped]], optional): To Be Filled In.
             *arguments (Any): To Be Filled In.
         
         Returns:
@@ -155,7 +155,7 @@ class Styled:
         
         Args:
             eventType (str): To Be Filled In.
-            handlerOrNull (optional) (Any): To Be Filled In.
+            handlerOrNull (Any, optional): To Be Filled In.
         """
         self.send_only("handleEvent", eventType, handlerOrNull)
 
@@ -498,7 +498,7 @@ class Poly(Styled):
         """To Be Filled In.
         
         Args:
-            boolean (optional) (bool): To Be Filled In.
+            boolean (bool, optional): To Be Filled In.
         
         Returns:
             'Poly': To Be Filled In.
@@ -520,7 +520,7 @@ class Poly3d(Styled):
         """To Be Filled In.
         
         Args:
-            boolean (optional) (bool): To Be Filled In.
+            boolean (bool, optional): To Be Filled In.
         
         Returns:
             'Poly3d': To Be Filled In.
@@ -534,8 +534,8 @@ class Poly3d(Styled):
         """To Be Filled In.
         
         Args:
-            defaultxyz (optional) (Any): To Be Filled In.
-            alpha (optional) (Optional[float]): To Be Filled In.
+            defaultxyz (Any, optional): To Be Filled In.
+            alpha (Optional[float], optional): To Be Filled In.
         
         Returns:
             'Poly3d': To Be Filled In.
