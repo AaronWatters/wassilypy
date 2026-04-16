@@ -436,7 +436,7 @@ class Frame(marking.Styled):
         
         Args:
             name (str): To Be Filled In.
-            png_data (Any): To Be Filled In.
+            png_data (Any): To Be Filled In. PNG-encoded binary image data.
         
         Returns:
             'Frame': To Be Filled In.

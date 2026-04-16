@@ -155,7 +155,10 @@ class Styled:
         
         Args:
             eventType (str): To Be Filled In.
-            handlerOrNull (Any, optional): To Be Filled In.
+            handlerOrNull (Any, optional): To Be Filled In. If not null, the
+                handler signature is
+                ``handler(name, eventType, canvasXY, cartesianXY, frameXY)``.
+                A null handler cancels the previous handler.
         """
         self.send_only("handleEvent", eventType, handlerOrNull)
 
