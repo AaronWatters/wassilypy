@@ -28,7 +28,7 @@ async def wassily2d(
         link (bool, optional): To Be Filled In.
     
     Returns:
-        'Frame': To Be Filled In.
+        To Be Filled In.
     """
     diagram = Diagram(width, height)
     if link:
@@ -89,7 +89,7 @@ async def swatch(
         link (bool, optional): To Be Filled In.
     
     Returns:
-        'Frame': To Be Filled In.
+        To Be Filled In.
     """
     view = SwatchView(pixelSize, modelSize, center)
     if link:
@@ -168,7 +168,7 @@ async def cube(
         link (bool, optional): To Be Filled In.
     
     Returns:
-        'Frame3d': To Be Filled In.
+        To Be Filled In.
     """
     view = CubeView(pixelSize, modelSize, modelCenter, perspective, shrink)
     if link:
@@ -239,7 +239,7 @@ class Diagram(gz.jQueryComponent):
             styled_name (str): To Be Filled In.
         
         Returns:
-            Any: To Be Filled In.
+            To Be Filled In.
         """
         return self.js_diagram.getStyledByName(styled_name)
     
@@ -251,7 +251,7 @@ class Diagram(gz.jQueryComponent):
             prefix (str, optional): To Be Filled In.
         
         Returns:
-            Any: To Be Filled In.
+            To Be Filled In.
         """
         new_id = gz.new_identifier(prefix)
         gz.do(js_ref.rename(new_id))
@@ -274,7 +274,7 @@ class Frame(marking.Styled):
         """To Be Filled In.
         
         Returns:
-            'Frame': To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("clear")
 
@@ -285,7 +285,7 @@ class Frame(marking.Styled):
             border (float, optional): To Be Filled In.
         
         Returns:
-            'Frame': To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("fit", border)
 
@@ -296,7 +296,7 @@ class Frame(marking.Styled):
             listMatrix (Any): To Be Filled In.
         
         Returns:
-            'Frame': To Be Filled In.
+            To Be Filled In.
         """
         listMatrix = listiffy(listMatrix)
         return self.send_only("setAffine", listMatrix)
@@ -315,7 +315,7 @@ class Frame(marking.Styled):
             toMaxxy (Any): To Be Filled In.
         
         Returns:
-            'Frame': To Be Filled In.
+            To Be Filled In.
         """
         fromMinxy = listiffy(fromMinxy)
         fromMaxxy = listiffy(fromMaxxy)
@@ -341,7 +341,7 @@ class Frame(marking.Styled):
             upVector (Any, optional): To Be Filled In.
         
         Returns:
-            'Frame3d': To Be Filled In.
+            To Be Filled In.
         """
         eyePoint = listiffy(eyePoint)
         lookAtPoint = listiffy(lookAtPoint)
@@ -365,7 +365,7 @@ class Frame(marking.Styled):
             constructor (None, optional): To Be Filled In.
         
         Returns:
-            marking.Styled: To Be Filled In.
+            To Be Filled In.
         """
         ...
 
@@ -381,7 +381,7 @@ class Frame(marking.Styled):
             constructor (Callable[[Any, Any], TWrapped]): To Be Filled In.
         
         Returns:
-            TWrapped: To Be Filled In.
+            To Be Filled In.
         """
         ...
 
@@ -397,7 +397,7 @@ class Frame(marking.Styled):
             constructor (Optional[Callable[[Any, Any], TWrapped]], optional): To Be Filled In.
         
         Returns:
-            marking.Styled: To Be Filled In.
+            To Be Filled In.
         """
         if constructor is None:
             constructor = marking.Styled
@@ -411,7 +411,7 @@ class Frame(marking.Styled):
             url (str): To Be Filled In.
         
         Returns:
-            'Frame': To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("nameImageFromURL", name, url)
 
@@ -419,7 +419,7 @@ class Frame(marking.Styled):
         """To Be Filled In.
         
         Returns:
-            'Frame': To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("pauseRedraw")
 
@@ -427,7 +427,7 @@ class Frame(marking.Styled):
         """To Be Filled In.
         
         Returns:
-            'Frame': To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("resumeRedraw")
 
@@ -439,7 +439,7 @@ class Frame(marking.Styled):
             png_data (Any): To Be Filled In. PNG-encoded binary image data.
         
         Returns:
-            'Frame': To Be Filled In.
+            To Be Filled In.
         """
         png_data = force_uint8_array(png_data)
         return self.send_only("nameImageFromPNGData", name, png_data)
@@ -461,7 +461,7 @@ class Frame(marking.Styled):
             scaled (bool, optional): To Be Filled In.
         
         Returns:
-            marking.Image: To Be Filled In.
+            To Be Filled In.
         """
         pngdata = force_uint8_array(pngdata)
         return self.wrapResult(
@@ -485,7 +485,7 @@ class Frame(marking.Styled):
             scaled (bool, optional): To Be Filled In.
         
         Returns:
-            marking.Image: To Be Filled In.
+            To Be Filled In.
         """
         return self.wrapResult(
             "namedImage", marking.Image,
@@ -499,7 +499,7 @@ class Frame(marking.Styled):
             end (Any): To Be Filled In.
         
         Returns:
-            marking.Line: To Be Filled In.
+            To Be Filled In.
         """
         return self.wrapResult("line", marking.Line, start, end)
     
@@ -516,7 +516,7 @@ class Frame(marking.Styled):
             scaled (bool, optional): To Be Filled In.
         
         Returns:
-            marking.Circle: To Be Filled In.
+            To Be Filled In.
         """
         return self.wrapResult("dot", marking.Circle, center, radius, scaled)
     
@@ -533,7 +533,7 @@ class Frame(marking.Styled):
             scaled (bool, optional): To Be Filled In.
         
         Returns:
-            marking.Circle: To Be Filled In.
+            To Be Filled In.
         """
         return self.wrapResult("circle", marking.Circle, center, radius, scaled)
     
@@ -554,7 +554,7 @@ class Frame(marking.Styled):
             rotationDegrees (float, optional): To Be Filled In.
         
         Returns:
-            marking.Rect: To Be Filled In.
+            To Be Filled In.
         """
         return self.wrapResult(
             "rect", marking.Rect, 
@@ -575,7 +575,7 @@ class Frame(marking.Styled):
             scaled (bool, optional): To Be Filled In.
         
         Returns:
-            marking.Rect: To Be Filled In.
+            To Be Filled In.
         """
         return self.wrapResult(
             "box", marking.Rect, 
@@ -596,7 +596,7 @@ class Frame(marking.Styled):
             scaled (bool, optional): To Be Filled In.
         
         Returns:
-            marking.Rect: To Be Filled In.
+            To Be Filled In.
         """
         size = [side, side]
         return self.wrapResult(
@@ -610,7 +610,7 @@ class Frame(marking.Styled):
             points (Any): To Be Filled In.
         
         Returns:
-            marking.Poly: To Be Filled In.
+            To Be Filled In.
         """
         return self.wrapResult("polyline", marking.Poly, points)
     
@@ -621,7 +621,7 @@ class Frame(marking.Styled):
             points (Any): To Be Filled In.
         
         Returns:
-            marking.Poly: To Be Filled In.
+            To Be Filled In.
         """
         return self.wrapResult("polygon", marking.Poly, points).filled().closed()
     
@@ -642,7 +642,7 @@ class Frame(marking.Styled):
             background (Any, optional): To Be Filled In.
         
         Returns:
-            marking.TextBox: To Be Filled In.
+            To Be Filled In.
         """
         return self.wrapResult(
             "textBox", marking.TextBox,
@@ -665,7 +665,7 @@ class Frame(marking.Styled):
             degrees (float, optional): To Be Filled In.
         
         Returns:
-            marking.Star: To Be Filled In.
+            To Be Filled In.
         """
         return self.wrapResult(
             "star", marking.Star,
@@ -688,7 +688,7 @@ class Frame(marking.Styled):
             tipFactor (float, optional): To Be Filled In.
         
         Returns:
-            marking.Arrow: To Be Filled In.
+            To Be Filled In.
         """
         return self.wrapResult(
             "arrow", marking.Arrow,
@@ -701,7 +701,7 @@ def force_uint8_array(x: Any) -> np.ndarray:
         x (Any): To Be Filled In.
     
     Returns:
-        np.ndarray: To Be Filled In.
+        To Be Filled In.
     """
     if isinstance(x, np.ndarray):
         if x.dtype != np.uint8:
@@ -724,7 +724,7 @@ class Frame3d(marking.Styled):
             epsilon (float, optional): To Be Filled In.
         
         Returns:
-            'Frame3d': To Be Filled In.
+            To Be Filled In.
         """
         lookAtPoint = listiffy(lookAtPoint)
         return self.send_only("lookAt", lookAtPoint, epsilon)
@@ -742,7 +742,7 @@ class Frame3d(marking.Styled):
             epsilon (float, optional): To Be Filled In.
         
         Returns:
-            'Frame3d': To Be Filled In.
+            To Be Filled In.
         """
         eyePoint = listiffy(eyePoint)
         if upVector is not None:
@@ -753,7 +753,7 @@ class Frame3d(marking.Styled):
         """To Be Filled In.
         
         Returns:
-            'Frame3d': To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("orbit")
     
@@ -761,7 +761,7 @@ class Frame3d(marking.Styled):
         """To Be Filled In.
         
         Returns:
-            'Frame3d': To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("clear")
     
@@ -772,7 +772,7 @@ class Frame3d(marking.Styled):
             border (float, optional): To Be Filled In.
         
         Returns:
-            'Frame3d': To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("fit", border)
     
@@ -784,7 +784,7 @@ class Frame3d(marking.Styled):
             url (str): To Be Filled In.
         
         Returns:
-            'Frame3d': To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("nameImageFromURL", name, url)
     
@@ -805,7 +805,7 @@ class Frame3d(marking.Styled):
             scaled (bool, optional): To Be Filled In.
         
         Returns:
-            marking.Image3d: To Be Filled In.
+            To Be Filled In.
         """
         return self.wrapResult(
             "imageFromURL", marking.Image3d,
@@ -828,7 +828,7 @@ class Frame3d(marking.Styled):
             scaled (bool, optional): To Be Filled In.
         
         Returns:
-            marking.Image3d: To Be Filled In.
+            To Be Filled In.
         """
         return self.wrapResult(
             "namedImage", marking.Image3d,
@@ -851,7 +851,7 @@ class Frame3d(marking.Styled):
             background (Any, optional): To Be Filled In.
         
         Returns:
-            marking.TextBox3d: To Be Filled In.
+            To Be Filled In.
         """
         return self.wrapResult(
             "textBox", marking.TextBox3d,
@@ -865,7 +865,7 @@ class Frame3d(marking.Styled):
             end3d (Any): To Be Filled In.
         
         Returns:
-            marking.Line3d: To Be Filled In.
+            To Be Filled In.
         """
         return self.wrapResult("line", marking.Line3d, start3d, end3d)
     
@@ -876,7 +876,7 @@ class Frame3d(marking.Styled):
             points3d (Any): To Be Filled In.
         
         Returns:
-            marking.Poly3d: To Be Filled In.
+            To Be Filled In.
         """
         return self.wrapResult("polygon", marking.Poly3d, points3d)
     
@@ -887,7 +887,7 @@ class Frame3d(marking.Styled):
             points3d (Any): To Be Filled In.
         
         Returns:
-            marking.Poly3d: To Be Filled In.
+            To Be Filled In.
         """
         return self.wrapResult("polyline", marking.Poly3d, points3d)
     
@@ -899,6 +899,6 @@ class Frame3d(marking.Styled):
             radius (float): To Be Filled In.
         
         Returns:
-            marking.Circle3d: To Be Filled In.
+            To Be Filled In.
         """
         return self.wrapResult("circle", marking.Circle3d, center3d, radius)
