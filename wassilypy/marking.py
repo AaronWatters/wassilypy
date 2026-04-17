@@ -20,7 +20,7 @@ def listiffy(x: Any) -> Any:
         x (Any): To Be Filled In.
     
     Returns:
-        Any: To Be Filled In.
+        To Be Filled In.
     """
     if isinstance(x, np.ndarray):
         return x.tolist()
@@ -51,7 +51,7 @@ class Styled:
             constructor (Callable[[Any, Any], TWrapped]): To Be Filled In.
         
         Returns:
-            TWrapped: To Be Filled In.
+            To Be Filled In.
         """
         return constructor(self.js_reference, self.on_diagram)
 
@@ -69,7 +69,7 @@ class Styled:
             *arguments (Any): To Be Filled In.
         
         Returns:
-            'Styled': To Be Filled In.
+            To Be Filled In.
         """
         ...
 
@@ -87,7 +87,7 @@ class Styled:
             *arguments (Any): To Be Filled In.
         
         Returns:
-            TWrapped: To Be Filled In.
+            To Be Filled In.
         """
         ...
 
@@ -104,7 +104,7 @@ class Styled:
             *arguments (Any): To Be Filled In.
         
         Returns:
-            Union['Styled', TWrapped]: To Be Filled In.
+            To Be Filled In.
         """
         args = (listiffy(arg) for arg in arguments)
         js_ref = self.js_reference[methodname](*args)
@@ -125,7 +125,7 @@ class Styled:
             *arguments (Any): To Be Filled In.
         
         Returns:
-            TStyled: To Be Filled In.
+            To Be Filled In.
         """
         args = (listiffy(arg) for arg in arguments)
         gz.do(self.js_reference[methodname](*args))
@@ -138,7 +138,7 @@ class Styled:
             durationSeconds (float): To Be Filled In.
         
         Returns:
-            TStyled: To Be Filled In.
+            To Be Filled In.
         """
         myClassConstructor = self.__class__
         jsTransitionCall = self.js_reference.transition(durationSeconds)
@@ -169,7 +169,7 @@ class Styled:
             join_spec (Any): To Be Filled In.
         
         Returns:
-            TStyled: To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("join", join_spec)
 
@@ -180,7 +180,7 @@ class Styled:
             font_spec (Any): To Be Filled In.
         
         Returns:
-            TStyled: To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("font", font_spec)
 
@@ -188,7 +188,7 @@ class Styled:
         """To Be Filled In.
         
         Returns:
-            TStyled: To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("stroked")
     
@@ -196,7 +196,7 @@ class Styled:
         """To Be Filled In.
         
         Returns:
-            TStyled: To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("filled")
     
@@ -207,7 +207,7 @@ class Styled:
             color_spec (Any): To Be Filled In.
         
         Returns:
-            TStyled: To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("colored", color_spec)
     
@@ -218,7 +218,7 @@ class Styled:
             width (float): To Be Filled In.
         
         Returns:
-            TStyled: To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("linedWidth", width)
     
@@ -229,7 +229,7 @@ class Styled:
             dash_list_or_null (Any): To Be Filled In.
         
         Returns:
-            TStyled: To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("dashed", dash_list_or_null)
     
@@ -240,7 +240,7 @@ class Styled:
             xy (Any): To Be Filled In.
         
         Returns:
-            TStyled: To Be Filled In.
+            To Be Filled In.
         """
         xy = listiffy(xy)
         return self.send_only("setFramePoint", xy)
@@ -252,7 +252,7 @@ class Styled:
             xy (Any): To Be Filled In.
         
         Returns:
-            TStyled: To Be Filled In.
+            To Be Filled In.
         """
         xy = listiffy(xy)
         return self.send_only("setPixel", xy)
@@ -264,7 +264,7 @@ class Styled:
             xy (Any): To Be Filled In.
         
         Returns:
-            TStyled: To Be Filled In.
+            To Be Filled In.
         """
         return self.setFramePoint(xy)
     
@@ -279,7 +279,7 @@ class Styled:
         """To Be Filled In.
         
         Returns:
-            TStyled: To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("requestRedraw")
 
@@ -294,7 +294,7 @@ class Line(Styled):
             xy (Any): To Be Filled In.
         
         Returns:
-            'Line': To Be Filled In.
+            To Be Filled In.
         """
         xy = listiffy(xy)
         return self.send_only("startAt", xy)
@@ -306,7 +306,7 @@ class Line(Styled):
             xy (Any): To Be Filled In.
         
         Returns:
-            'Line': To Be Filled In.
+            To Be Filled In.
         """
         xy = listiffy(xy)
         return self.send_only("endAt", xy)
@@ -321,7 +321,7 @@ class Circle(Styled):
             xy (Any): To Be Filled In.
         
         Returns:
-            'Circle': To Be Filled In.
+            To Be Filled In.
         """
         xy = listiffy(xy)
         return self.send_only("centerAt", xy)
@@ -333,7 +333,7 @@ class Circle(Styled):
             radius (float): To Be Filled In.
         
         Returns:
-            'Circle': To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("resize", radius)
     
@@ -344,7 +344,7 @@ class Circle(Styled):
             boolean (bool): To Be Filled In.
         
         Returns:
-            'Circle': To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("scaling", boolean)
 
@@ -358,7 +358,7 @@ class Rect(Styled):
             angle (float): To Be Filled In.
         
         Returns:
-            'Rect': To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("degrees", angle)
     
@@ -369,7 +369,7 @@ class Rect(Styled):
             wh (Any): To Be Filled In.
         
         Returns:
-            'Rect': To Be Filled In.
+            To Be Filled In.
         """
         wh = listiffy(wh)
         return self.send_only("resize", wh)
@@ -381,7 +381,7 @@ class Rect(Styled):
             xy (Any): To Be Filled In.
         
         Returns:
-            'Rect': To Be Filled In.
+            To Be Filled In.
         """
         xy = listiffy(xy)
         return self.send_only("offsetBy", xy)
@@ -393,7 +393,7 @@ class Rect(Styled):
             boolean (bool): To Be Filled In.
         
         Returns:
-            'Rect': To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("scaling", boolean)
     
@@ -404,7 +404,7 @@ class Rect(Styled):
             xy (Any): To Be Filled In.
         
         Returns:
-            'Rect': To Be Filled In.
+            To Be Filled In.
         """
         xy = listiffy(xy)
         return self.send_only("locateAt", xy)
@@ -423,7 +423,7 @@ class TextBox(Rect):
             text (str): To Be Filled In.
         
         Returns:
-            'TextBox': To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("setText", text)
     
@@ -434,7 +434,7 @@ class TextBox(Rect):
             alignment (str): To Be Filled In.
         
         Returns:
-            'TextBox': To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("valigned", alignment)
     
@@ -445,7 +445,7 @@ class TextBox(Rect):
             alignment (str): To Be Filled In.
         
         Returns:
-            'TextBox': To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("aligned", alignment)
     
@@ -456,7 +456,7 @@ class TextBox(Rect):
             shift (Any): To Be Filled In.
         
         Returns:
-            'TextBox': To Be Filled In.
+            To Be Filled In.
         """
         shift = listiffy(shift)
         return self.send_only("setShift", shift)
@@ -468,7 +468,7 @@ class TextBox(Rect):
             background_spec_or_null (Any): To Be Filled In.
         
         Returns:
-            'TextBox': To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("boxed", background_spec_or_null)
     
@@ -476,7 +476,7 @@ class TextBox(Rect):
         """To Be Filled In.
         
         Returns:
-            Any: To Be Filled In.
+            To Be Filled In.
         """
         result = await gz.get(self.js_reference.getSize())
         return result
@@ -492,7 +492,7 @@ class Poly(Styled):
             points (Any): To Be Filled In.
         
         Returns:
-            'Poly': To Be Filled In.
+            To Be Filled In.
         """
         points = listiffy(points)
         return self.send_only("vertices", points)
@@ -504,7 +504,7 @@ class Poly(Styled):
             boolean (bool, optional): To Be Filled In.
         
         Returns:
-            'Poly': To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("closed", boolean)
 
@@ -526,7 +526,7 @@ class Poly3d(Styled):
             boolean (bool, optional): To Be Filled In.
         
         Returns:
-            'Poly3d': To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("closed", boolean)
     
@@ -541,7 +541,7 @@ class Poly3d(Styled):
             alpha (Optional[float], optional): To Be Filled In.
         
         Returns:
-            'Poly3d': To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("normalColored", defaultxyz, alpha)
 
@@ -555,7 +555,7 @@ class Rect3d(Styled):
             angle (float): To Be Filled In.
         
         Returns:
-            'Rect3d': To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("degrees", angle)
     
@@ -566,7 +566,7 @@ class Rect3d(Styled):
             wh (Any): To Be Filled In.
         
         Returns:
-            'Rect3d': To Be Filled In.
+            To Be Filled In.
         """
         wh = listiffy(wh)
         return self.send_only("resize", wh)
@@ -578,7 +578,7 @@ class Rect3d(Styled):
             xy (Any): To Be Filled In.
         
         Returns:
-            'Rect3d': To Be Filled In.
+            To Be Filled In.
         """
         xy = listiffy(xy)
         return self.send_only("offsetBy", xy)
@@ -590,7 +590,7 @@ class Rect3d(Styled):
             boolean (bool): To Be Filled In.
         
         Returns:
-            'Rect3d': To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("scaling", boolean)
     
@@ -601,7 +601,7 @@ class Rect3d(Styled):
             xy (Any): To Be Filled In.
         
         Returns:
-            'Rect3d': To Be Filled In.
+            To Be Filled In.
         """
         xy = listiffy(xy)
         return self.send_only("locateAt", xy)
@@ -628,7 +628,7 @@ class Circle3d(Styled):
             boolean (bool): To Be Filled In.
         
         Returns:
-            'Circle3d': To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("scaling", boolean)
     
@@ -639,7 +639,7 @@ class Circle3d(Styled):
             xy (Any): To Be Filled In.
         
         Returns:
-            'Circle3d': To Be Filled In.
+            To Be Filled In.
         """
         xy = listiffy(xy)
         return self.send_only("centered", xy)
@@ -651,6 +651,6 @@ class Circle3d(Styled):
             radius (float): To Be Filled In.
         
         Returns:
-            'Circle3d': To Be Filled In.
+            To Be Filled In.
         """
         return self.send_only("resized", radius)
