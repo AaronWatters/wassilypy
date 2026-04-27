@@ -1,6 +1,6 @@
 
 """
-To Be Filled In.
+Frames and diagrams and convenience functions for creating interactive visualizations.
 """
 
 from typing import Any, Callable, Optional, TypeVar, overload
@@ -20,12 +20,12 @@ async def wassily2d(
         width: float,
         height: Optional[float] = None,
         link: bool = True) -> "Frame":
-    """To Be Filled In.
+    """Create a 2D visualization frame.
     
     Args:
-        width (float): To Be Filled In.
-        height (Optional[float], optional): To Be Filled In.
-        link (bool, optional): To Be Filled In.
+        width (float): Width of the frame in pixels.
+        height (Optional[float], optional): Height of the frame in pixels. Defaults to None.
+        link (bool, optional): If true then print an URL link to open the frame, otherwise try to open it in the browser.
     
     Returns:
         To Be Filled In.
@@ -39,18 +39,18 @@ async def wassily2d(
 
 class SwatchView:
 
-    """To Be Filled In."""
+    """A square diagram."""
     def __init__(
             self,
             pixelSize: float,
             modelSize: float,
             center: Any = [0,0]) -> None:
-        """To Be Filled In.
+        """A square diagram..
         
         Args:
-            pixelSize (float): To Be Filled In.
-            modelSize (float): To Be Filled In.
-            center (Any, optional): To Be Filled In.
+            pixelSize (float): Side length of the square in pixels.
+            modelSize (float): Side length of the square in model coordinates.
+            center (Any, optional): Center of the square in model coordinates (default is [0,0]).
         """
         self.pixelSize = pixelSize
         self.modelSize = modelSize
@@ -59,7 +59,7 @@ class SwatchView:
         self.diagram.call_when_started(self.start)
 
     def start(self) -> None:
-        """To Be Filled In.
+        """Create the model frame for the diagram.
         """
         modelSize = self.modelSize
         pixelSize = self.pixelSize
@@ -80,16 +80,16 @@ async def swatch(
         modelSize: float,
         center: Any = [0,0],
         link: bool = True) -> "Frame":
-    """To Be Filled In.
+    """Create a swatch visualization frame.
     
     Args:
-        pixelSize (float): To Be Filled In.
-        modelSize (float): To Be Filled In.
-        center (Any, optional): To Be Filled In.
-        link (bool, optional): To Be Filled In.
+        pixelSize (float): Side length of the square in pixels.
+        modelSize (float): Side length of the square in model coordinates.
+        center (Any, optional): Center of the square in model coordinates (default is [0,0]).
+        link (bool, optional): If true then print an URL link to open the frame, otherwise try to open it in the browser.
     
     Returns:
-        To Be Filled In.
+        Frame: The created swatch frame.
     """
     view = SwatchView(pixelSize, modelSize, center)
     if link:
@@ -101,7 +101,7 @@ async def swatch(
 
 class CubeView:
 
-    """To Be Filled In."""
+    """A 3D cube diagram."""
     def __init__(
             self,
             pixelSize: float,
@@ -109,14 +109,14 @@ class CubeView:
             modelCenter: Any = [0,0,0],
             perspective: bool = True,
             shrink: float = 0.9) -> None:
-        """To Be Filled In.
+        """Create a 3D cube diagram.
         
         Args:
-            pixelSize (float): To Be Filled In.
-            modelSize (float): To Be Filled In.
-            modelCenter (Any, optional): To Be Filled In.
-            perspective (bool, optional): To Be Filled In.
-            shrink (float, optional): To Be Filled In.
+            pixelSize (float): Side length of the cube in pixels.
+            modelSize (float): Side length of the cube in model coordinates.
+            modelCenter (Any, optional): Center of the cube in model coordinates (default is [0,0,0]).
+            perspective (bool, optional): If true then use perspective projection, otherwise use orthographic projection.
+            shrink (float, optional): Factor by which to shrink the cube in the visualization.
         """
         self.pixelSize = pixelSize
         self.modelSize = modelSize
@@ -127,7 +127,7 @@ class CubeView:
         self.diagram.call_when_started(self.start)
 
     def start(self) -> None:
-        """To Be Filled In.
+        """Create the 3D cube frame for the diagram.
         """
         modelSize = self.modelSize
         pixelSize = self.pixelSize
@@ -157,18 +157,18 @@ async def cube(
         perspective: bool = True,
         shrink: float = 0.9,
         link: bool = True) -> "Frame3d":
-    """To Be Filled In.
+    """Create a 3D cube visualization frame.
     
     Args:
-        pixelSize (float): To Be Filled In.
-        modelSize (float): To Be Filled In.
-        modelCenter (Any, optional): To Be Filled In.
-        perspective (bool, optional): To Be Filled In.
-        shrink (float, optional): To Be Filled In.
-        link (bool, optional): To Be Filled In.
+        pixelSize (float): Side length of the cube in pixels.
+        modelSize (float): Side length of the cube in model coordinates.
+        modelCenter (Any, optional): Center of the cube in model coordinates (default is [0,0,0]).
+        perspective (bool, optional): If true then use perspective projection, otherwise use orthographic projection.
+        shrink (float, optional): Factor by which to shrink the cube in the visualization.
+        link (bool, optional): If true then print an URL link to open the frame, otherwise try to open it in the browser.
     
     Returns:
-        To Be Filled In.
+        Frame3d: The created 3D cube frame.
     """
     view = CubeView(pixelSize, modelSize, modelCenter, perspective, shrink)
     if link:
@@ -195,13 +195,13 @@ async def cube(pixelSize, modelSize, modelCenter=[0,0,0], perspective=True, shri
 
 class Diagram(gz.jQueryComponent):
 
-    """To Be Filled In."""
+    """A canvas diagram with a standard primary frame."""
     def __init__(self, width: float, height: Optional[float] = None) -> None:
-        """To Be Filled In.
+        """Make a diagram with a primary frame of the given width and height.
         
         Args:
-            width (float): To Be Filled In.
-            height (Optional[float], optional): To Be Filled In.
+            width (float): The width of the diagram in pixels.
+            height (Optional[float], optional): The height of the diagram in pixels.
         """
         tag = "<div/>"
         super().__init__(tag)
@@ -214,10 +214,10 @@ class Diagram(gz.jQueryComponent):
         self.js_file(js_path)
 
     def configure_jQuery_element(self, element: Any) -> None:
-        """To Be Filled In.
+        """Configure the jQuery element for the diagram.
         
         Args:
-            element (Any): To Be Filled In.
+            element (Any): The jQuery element to contain the diagram..
         """
         super().configure_jQuery_element(element)
         domdiv = element[0]
@@ -233,25 +233,25 @@ class Diagram(gz.jQueryComponent):
         gz.do(console.log("diagram", self.js_diagram))
 
     def styledRef(self, styled_name: str) -> Any:
-        """To Be Filled In.
+        """Get a reference to a styled element in the diagram by name.
         
         Args:
-            styled_name (str): To Be Filled In.
+            styled_name (str): The name of the styled element to retrieve.
         
         Returns:
-            To Be Filled In.
+            Reference to the JavaScript object for the styled element.
         """
         return self.js_diagram.getStyledByName(styled_name)
     
     def wrapNamed(self, js_ref: Any, prefix: str = "wassilypy") -> Any:
-        """To Be Filled In.
+        """Return a reference to a named element in the diagram.
         
         Args:
-            js_ref (Any): To Be Filled In.
-            prefix (str, optional): To Be Filled In.
+            js_ref (Any): The JavaScript reference to wrap.
+            prefix (str, optional): The prefix for the new identifier.
         
         Returns:
-            To Be Filled In.
+            Reference to the JavaScript object for the named element.
         """
         new_id = gz.new_identifier(prefix)
         gz.do(js_ref.rename(new_id))
@@ -260,43 +260,43 @@ class Diagram(gz.jQueryComponent):
 
 class Frame(marking.Styled):
     
-    """To Be Filled In."""
+    """A 'model coordinate' frame on the diagram."""
     def __init__(self, js_reference: Any, on_diagram: Any) -> None:
-        """To Be Filled In.
+        """Create a new frame.
         
         Args:
-            js_reference (Any): To Be Filled In.
-            on_diagram (Any): To Be Filled In.
+            js_reference (Any): The JavaScript reference to the frame.
+            on_diagram (Any): The diagram to which the frame belongs.
         """
         super().__init__(js_reference, on_diagram)
 
     def clear(self) -> "Frame":
-        """To Be Filled In.
+        """Clear the frame.
         
         Returns:
-            To Be Filled In.
+            The frame for chaining.
         """
         return self.send_only("clear")
 
     def fit(self, border: float = 0) -> "Frame":
-        """To Be Filled In.
+        """Fit the frame to the diagram.
         
         Args:
-            border (float, optional): To Be Filled In.
+            border (float, optional): The border around the frame.
         
         Returns:
-            To Be Filled In.
+            The frame for chaining.
         """
         return self.send_only("fit", border)
 
     def setAffine(self, listMatrix: Any) -> "Frame":
-        """To Be Filled In.
+        """Set the affine transformation for the frame.
         
         Args:
-            listMatrix (Any): To Be Filled In.
+            listMatrix (Any): The matrix to set.
         
         Returns:
-            To Be Filled In.
+            The frame for chaining.
         """
         listMatrix = listiffy(listMatrix)
         return self.send_only("setAffine", listMatrix)

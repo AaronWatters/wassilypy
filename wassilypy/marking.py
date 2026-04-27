@@ -3,7 +3,7 @@
 To Be Filled In.
 """
 
-from typing import Any, Callable, Optional, TypeVar, Union, overload
+from typing import Any, Callable, Optional, TypeVar, Union, overload, Protocol
 
 import H5Gizmos as gz
 import numpy as np
@@ -11,16 +11,25 @@ import numpy as np
 TStyled = TypeVar("TStyled", bound="Styled")
 TWrapped = TypeVar("TWrapped", bound="Styled")
 
+class EventHandler(Protocol):
+    def __call__(
+        self,
+        name: str,
+        eventType: str,
+        canvasXY: Any,
+        cartesianXY: Any,
+        frameXY: Any,
+    ) -> None: ...
 
 def listiffy(x: Any) -> Any:
     # convert numpy arrays and all elements of tuples/lists to lists
-    """To Be Filled In.
+    """Convert numpy arrays and all elements of tuples/lists to lists
     
     Args:
-        x (Any): To Be Filled In.
+        x (Any): Object to convert.
     
     Returns:
-        To Be Filled In.
+        Any: Converted object.
     """
     if isinstance(x, np.ndarray):
         return x.tolist()
@@ -31,13 +40,13 @@ def listiffy(x: Any) -> Any:
     
 class Styled:
 
-    """To Be Filled In."""
+    """A styled element in the diagram."""
     def __init__(self, js_reference: Any, on_diagram: Any) -> None:
-        """To Be Filled In.
+        """Attach a JavaScript reference to the styled element.
         
         Args:
-            js_reference (Any): To Be Filled In.
-            on_diagram (Any): To Be Filled In.
+            js_reference: The JavaScript reference.
+            on_diagram: The diagram to which the element belongs.
         """
         self.js_reference = js_reference
         self.on_diagram = on_diagram
@@ -45,13 +54,13 @@ class Styled:
     def coerceToSubclass(
             self,
             constructor: Callable[[Any, Any], TWrapped]) -> TWrapped:
-        """To Be Filled In.
+        """Convert this styled element to a subclass by using the provided constructor.
         
         Args:
-            constructor (Callable[[Any, Any], TWrapped]): To Be Filled In.
+            constructor: The constructor for the subclass.
         
         Returns:
-            To Be Filled In.
+            The converted styled element.
         """
         return constructor(self.js_reference, self.on_diagram)
 
@@ -61,16 +70,6 @@ class Styled:
             methodname: str,
             constructor: None = None,
             *arguments: Any) -> "Styled":
-        """To Be Filled In.
-        
-        Args:
-            methodname (str): To Be Filled In.
-            constructor (None, optional): To Be Filled In.
-            *arguments (Any): To Be Filled In.
-        
-        Returns:
-            To Be Filled In.
-        """
         ...
 
     @overload
@@ -79,16 +78,6 @@ class Styled:
             methodname: str,
             constructor: Callable[[Any, Any], TWrapped],
             *arguments: Any) -> TWrapped:
-        """To Be Filled In.
-        
-        Args:
-            methodname (str): To Be Filled In.
-            constructor (Callable[[Any, Any], TWrapped]): To Be Filled In.
-            *arguments (Any): To Be Filled In.
-        
-        Returns:
-            To Be Filled In.
-        """
         ...
 
     def wrapResult(
@@ -96,15 +85,15 @@ class Styled:
             methodname: str,
             constructor: Optional[Callable[[Any, Any], TWrapped]] = None,
             *arguments: Any) -> Union["Styled", TWrapped]:
-        """To Be Filled In.
+        """Wrap the result of a JavaScript method call in a styled element.
         
         Args:
-            methodname (str): To Be Filled In.
-            constructor (Optional[Callable[[Any, Any], TWrapped]], optional): To Be Filled In.
-            *arguments (Any): To Be Filled In.
+            methodname: The name of the JavaScript method to call.
+            constructor: The constructor for the wrapped element.
+            *arguments: The arguments for the JavaScript method call.
         
         Returns:
-            To Be Filled In.
+            The wrapped styled element.
         """
         args = (listiffy(arg) for arg in arguments)
         js_ref = self.js_reference[methodname](*args)
@@ -118,27 +107,27 @@ class Styled:
             self: TStyled,
             methodname: str,
             *arguments: Any) -> TStyled:
-        """To Be Filled In.
+        """Send a message to the JavaScript side without expecting a return value.
         
         Args:
-            methodname (str): To Be Filled In.
-            *arguments (Any): To Be Filled In.
+            methodname: The name of the JavaScript method to call.
+            *arguments: The arguments for the JavaScript method call.
         
         Returns:
-            To Be Filled In.
+            The styled element that sent the message.
         """
         args = (listiffy(arg) for arg in arguments)
         gz.do(self.js_reference[methodname](*args))
         return self
     
     def transition(self: TStyled, durationSeconds: float) -> TStyled:
-        """To Be Filled In.
+        """Create a clone of this styled element representing a transtion to a new state over the specified duration.
         
         Args:
-            durationSeconds (float): To Be Filled In.
+            durationSeconds: Duration of the transition.
         
         Returns:
-            To Be Filled In.
+            The cloned styled element representing the transition final state.
         """
         myClassConstructor = self.__class__
         jsTransitionCall = self.js_reference.transition(durationSeconds)
@@ -150,163 +139,165 @@ class Styled:
     def handleEvent(
             self,
             eventType: str,
-            handlerOrNull: Any = None) -> None:
-        """To Be Filled In.
-        
+            handlerOrNull: Optional[EventHandler] = None,
+            ) -> None:
+        """Register or unregister an event handler.
+
         Args:
-            eventType (str): To Be Filled In.
-            handlerOrNull (Any, optional): To Be Filled In. If not null, the
-                handler signature is
-                ``handler(name, eventType, canvasXY, cartesianXY, frameXY)``.
-                A null handler cancels the previous handler.
+            eventType: Type of event to handle.
+            handlerOrNull: Callback to invoke when the event fires.
+                If None, unregisters the current handler.
+
+        The handler is called as:
+            handler(name, eventType, canvasXY, cartesianXY, frameXY)
         """
         self.send_only("handleEvent", eventType, handlerOrNull)
 
-    def join(self: TStyled, join_spec: Any) -> TStyled:
-        """To Be Filled In.
+    def join(self: TStyled, join_spec: str) -> TStyled:
+        """Set the line join style.
         
         Args:
-            join_spec (Any): To Be Filled In.
+            join_spec: The line join style to set (CanvasLineJoin like "round", "bevel", "miter").
         
         Returns:
-            To Be Filled In.
+            The styled element with the updated line join style.
         """
         return self.send_only("join", join_spec)
 
-    def font(self: TStyled, font_spec: Any) -> TStyled:
-        """To Be Filled In.
+    def font(self: TStyled, font_spec: str) -> TStyled:
+        """Set the font.
         
         Args:
-            font_spec (Any): To Be Filled In.
+            font_spec: The font to set (like "16px Arial italic").
         
         Returns:
-            To Be Filled In.
+            The styled element with the updated font.
         """
         return self.send_only("font", font_spec)
 
     def stroked(self: TStyled) -> TStyled:
-        """To Be Filled In.
+        """Set the element to be stroked (not filled).
         
         Returns:
-            To Be Filled In.
+            The styled element with the updated stroke style.
         """
         return self.send_only("stroked")
     
     def filled(self: TStyled) -> TStyled:
-        """To Be Filled In.
+        """Set the element to be filled (not stroked).
         
         Returns:
-            To Be Filled In.
+            The styled element with the updated fill style.
         """
         return self.send_only("filled")
     
-    def colored(self: TStyled, color_spec: Any) -> TStyled:
-        """To Be Filled In.
+    def colored(self: TStyled, color_spec: str) -> TStyled:
+        """Set the color of the element.
         
         Args:
-            color_spec (Any): To Be Filled In.
+            color_spec: The color to set (like "red", "#ff0000", or "rgba(255, 0, 0, 1)").
         
         Returns:
-            To Be Filled In.
+            The styled element with the updated color.
         """
         return self.send_only("colored", color_spec)
     
     def linedWidth(self: TStyled, width: float) -> TStyled:
-        """To Be Filled In.
+        """Set the width of the line.
         
         Args:
-            width (float): To Be Filled In.
+            width (float): The width of the line to set.
         
         Returns:
-            To Be Filled In.
+            The styled element with the updated line width.
         """
         return self.send_only("linedWidth", width)
     
     def dashed(self: TStyled, dash_list_or_null: Any) -> TStyled:
-        """To Be Filled In.
+        """Set the dash pattern for the line.
         
         Args:
-            dash_list_or_null (Any): To Be Filled In.
+            dash_list_or_null (Any): The dash pattern to set like [10, 5].
         
         Returns:
-            To Be Filled In.
+            The styled element with the updated dash pattern.
         """
         return self.send_only("dashed", dash_list_or_null)
     
     def setFramePoint(self: TStyled, xy: Any) -> TStyled:
-        """To Be Filled In.
+        """Set the position of the element in frame coordinates.
         
         Args:
-            xy (Any): To Be Filled In.
+            xy (Any): The position to set.
         
         Returns:
-            To Be Filled In.
+            The styled element with the updated position.
         """
         xy = listiffy(xy)
         return self.send_only("setFramePoint", xy)
     
     def setPixel(self: TStyled, xy: Any) -> TStyled:
-        """To Be Filled In.
+        """Set the position of the element in pixel coordinates.
         
         Args:
-            xy (Any): To Be Filled In.
+            xy (Any): The position to set.
         
         Returns:
-            To Be Filled In.
+            The styled element with the updated position.
         """
         xy = listiffy(xy)
         return self.send_only("setPixel", xy)
     
     def position(self: TStyled, xy: Any) -> TStyled:
-        """To Be Filled In.
+        """Set the position of the element (in frame coordinates).
         
         Args:
-            xy (Any): To Be Filled In.
+            xy (Any): The position to set.
         
         Returns:
-            To Be Filled In.
+            The styled element with the updated position.
         """
         return self.setFramePoint(xy)
     
     def forget(self) -> None:
-        """To Be Filled In.
+        """Mark the element to be forgotten (deleted from the diagram)..
         """
         self.send_only("forget")
         self.js_reference = None
         self.on_diagram = None
 
     def requestRedraw(self: TStyled) -> TStyled:
-        """To Be Filled In.
+        """Request a redraw of the diagram containing the element.
         
         Returns:
-            To Be Filled In.
+            The styled element.
         """
         return self.send_only("requestRedraw")
 
 
 class Line(Styled):
     
-    """To Be Filled In."""
+    """A line segment element."""
     def startAt(self, xy: Any) -> "Line":
-        """To Be Filled In.
+        """Set the starting point of the line.
         
         Args:
-            xy (Any): To Be Filled In.
+            xy (Any): The starting point to set.
         
         Returns:
-            To Be Filled In.
+            The line element with the updated starting point.
         """
         xy = listiffy(xy)
         return self.send_only("startAt", xy)
     
     def endAt(self, xy: Any) -> "Line":
-        """To Be Filled In.
+        """Set the ending point of the line.
         
         Args:
-            xy (Any): To Be Filled In.
+            xy (Any): The ending point to set.
         
         Returns:
-            To Be Filled In.
+            The line element with the updated ending point.
         """
         xy = listiffy(xy)
         return self.send_only("endAt", xy)
