@@ -40,10 +40,10 @@ def listiffy(x: Any) -> Any:
     """Convert numpy arrays and all elements of tuples/lists to lists
     
     Args:
-        x (Any): Object to convert.
+        x: Object to convert.
     
     Returns:
-        Any: Converted object.
+        Converted object.
     """
     if isinstance(x, np.ndarray):
         return x.tolist()
@@ -220,7 +220,7 @@ class Styled:
         """Set the width of the line.
         
         Args:
-            width (float): The width of the line to set.
+            width: The width of the line to set.
         
         Returns:
             The styled element with the updated line width.
@@ -234,7 +234,7 @@ class Styled:
         """Set the dash pattern for the line.
         
         Args:
-            dash_list_or_null (Any): The dash pattern to set like [10, 5].
+            dash_list_or_null: The dash pattern to set like [10, 5].
         
         Returns:
             The styled element with the updated dash pattern.
@@ -245,7 +245,7 @@ class Styled:
         """Set the position of the element in frame coordinates.
         
         Args:
-            xy (Any): The position to set.
+            xy: The position to set.
         
         Returns:
             The styled element with the updated position.
@@ -257,7 +257,7 @@ class Styled:
         """Set the position of the element in pixel coordinates.
         
         Args:
-            xy (Any): The position to set.
+            xy: The position to set.
         
         Returns:
             The styled element with the updated position.
@@ -269,7 +269,7 @@ class Styled:
         """Set the position of the element (in frame coordinates).
         
         Args:
-            xy (Any): The position to set.
+            xy: The position to set.
         
         Returns:
             The styled element with the updated position.
@@ -299,7 +299,7 @@ class Line(Styled):
         """Set the starting point of the line.
         
         Args:
-            xy (Any): The starting point to set.
+            xy: The starting point to set.
         
         Returns:
             The line element with the updated starting point.
@@ -311,7 +311,7 @@ class Line(Styled):
         """Set the ending point of the line.
         
         Args:
-            xy (Any): The ending point to set.
+            xy: The ending point to set.
         
         Returns:
             The line element with the updated ending point.
@@ -326,7 +326,7 @@ class Circle(Styled):
         """To Be Filled In.
         
         Args:
-            xy (Any): To Be Filled In.
+            xy: To Be Filled In.
         
         Returns:
             To Be Filled In.
@@ -338,7 +338,7 @@ class Circle(Styled):
         """To Be Filled In.
         
         Args:
-            radius (float): To Be Filled In.
+            radius: To Be Filled In.
         
         Returns:
             To Be Filled In.
@@ -349,7 +349,7 @@ class Circle(Styled):
         """To Be Filled In.
         
         Args:
-            boolean (bool): To Be Filled In.
+            boolean: To Be Filled In.
         
         Returns:
             To Be Filled In.
@@ -363,7 +363,7 @@ class Rect(Styled):
         """To Be Filled In.
         
         Args:
-            angle (float): To Be Filled In.
+            angle: To Be Filled In.
         
         Returns:
             To Be Filled In.
@@ -374,7 +374,7 @@ class Rect(Styled):
         """To Be Filled In.
         
         Args:
-            wh (Any): To Be Filled In.
+            wh: To Be Filled In.
         
         Returns:
             To Be Filled In.
@@ -386,7 +386,7 @@ class Rect(Styled):
         """To Be Filled In.
         
         Args:
-            xy (Any): To Be Filled In.
+            xy: To Be Filled In.
         
         Returns:
             To Be Filled In.
@@ -398,7 +398,7 @@ class Rect(Styled):
         """To Be Filled In.
         
         Args:
-            boolean (bool): To Be Filled In.
+            boolean: To Be Filled In.
         
         Returns:
             To Be Filled In.
@@ -409,7 +409,7 @@ class Rect(Styled):
         """To Be Filled In.
         
         Args:
-            xy (Any): To Be Filled In.
+            xy: To Be Filled In.
         
         Returns:
             To Be Filled In.
@@ -428,7 +428,7 @@ class TextBox(Rect):
         """To Be Filled In.
         
         Args:
-            text (str): To Be Filled In.
+            text: To Be Filled In.
         
         Returns:
             To Be Filled In.
@@ -439,7 +439,7 @@ class TextBox(Rect):
         """To Be Filled In.
         
         Args:
-            alignment (str): To Be Filled In.
+            alignment: To Be Filled In.
         
         Returns:
             To Be Filled In.
@@ -450,7 +450,7 @@ class TextBox(Rect):
         """To Be Filled In.
         
         Args:
-            alignment (str): To Be Filled In.
+            alignment: To Be Filled In.
         
         Returns:
             To Be Filled In.
@@ -461,7 +461,7 @@ class TextBox(Rect):
         """To Be Filled In.
         
         Args:
-            shift (Any): To Be Filled In.
+            shift: To Be Filled In.
         
         Returns:
             To Be Filled In.
@@ -473,7 +473,7 @@ class TextBox(Rect):
         """To Be Filled In.
         
         Args:
-            background_spec_or_null (Any): To Be Filled In.
+            background_spec_or_null: To Be Filled In.
         
         Returns:
             To Be Filled In.
@@ -497,7 +497,7 @@ class Poly(Styled):
         """To Be Filled In.
         
         Args:
-            points (Any): To Be Filled In.
+            points: To Be Filled In.
         
         Returns:
             To Be Filled In.
@@ -509,7 +509,7 @@ class Poly(Styled):
         """To Be Filled In.
         
         Args:
-            boolean (bool, optional): To Be Filled In.
+            boolean: To Be Filled In.
         
         Returns:
             To Be Filled In.
@@ -531,7 +531,7 @@ class Poly3d(Styled):
         """To Be Filled In.
         
         Args:
-            boolean (bool, optional): To Be Filled In.
+            boolean: To Be Filled In.
         
         Returns:
             To Be Filled In.
@@ -540,13 +540,13 @@ class Poly3d(Styled):
     
     def normalColored(
             self,
-            defaultxyz: Any = [1,0,0],
+            defaultxyz: Vec3 = [1,0,0],
             alpha: Optional[float] = None) -> "Poly3d":
-        """To Be Filled In.
+        """Choose color based on polygon normal orientation.
         
         Args:
-            defaultxyz (Any, optional): To Be Filled In.
-            alpha (Optional[float], optional): To Be Filled In.
+            defaultxyz: Normal vector to use in edge cases.
+            alpha: The alpha value for the color.
         
         Returns:
             To Be Filled In.
@@ -555,12 +555,12 @@ class Poly3d(Styled):
 
 class Rect3d(Styled):
     
-    """To Be Filled In."""
+    """A rectangle in 3D space."""
     def degrees(self, angle: float) -> "Rect3d":
-        """To Be Filled In.
+        """Set the rotation angle of the rectangle.
         
         Args:
-            angle (float): To Be Filled In.
+            angle: The rotation angle in degrees.
         
         Returns:
             To Be Filled In.
@@ -568,13 +568,13 @@ class Rect3d(Styled):
         return self.send_only("degrees", angle)
     
     def resize(self, wh: Vec2) -> "Rect3d":
-        """To Be Filled In.
+        """Set the size of the rectangle.
         
         Args:
-            wh (Any): To Be Filled In.
+            wh: The new size of the rectangle.
         
         Returns:
-            To Be Filled In.
+            The rectangle for chaining.
         """
         wh = listiffy(wh)
         return self.send_only("resize", wh)
@@ -583,7 +583,7 @@ class Rect3d(Styled):
         """To Be Filled In.
         
         Args:
-            xy (Any): To Be Filled In.
+            xy: To Be Filled In.
         
         Returns:
             To Be Filled In.
@@ -595,7 +595,7 @@ class Rect3d(Styled):
         """To Be Filled In.
         
         Args:
-            boolean (bool): To Be Filled In.
+            boolean: To Be Filled In.
         
         Returns:
             To Be Filled In.
@@ -606,7 +606,7 @@ class Rect3d(Styled):
         """To Be Filled In.
         
         Args:
-            xy (Any): To Be Filled In.
+            xy: To Be Filled In.
         
         Returns:
             To Be Filled In.
@@ -615,50 +615,50 @@ class Rect3d(Styled):
         return self.send_only("locateAt", xy)
 
 class Image3d(Rect3d):
-    """To Be Filled In."""
+    """An image positioned in 3D space."""
     pass
 
 class TextBox3d(Rect3d):
-    """To Be Filled In."""
+    """A text box positioned in 3D space."""
     pass
 
 class Line3d(Styled):
-    """To Be Filled In."""
+    """A line in 3D space."""
     pass
 
 class Circle3d(Styled):
 
-    """To Be Filled In."""
+    """A circle in 3D space."""
     def scaling(self, boolean: bool) -> "Circle3d":
-        """To Be Filled In.
+        """Set whether the circle is scaled.
         
         Args:
-            boolean (bool): To Be Filled In.
+            boolean: True if the circle should be scaled, False otherwise.
         
         Returns:
-            To Be Filled In.
+            The circle for chaining.
         """
         return self.send_only("scaling", boolean)
     
     def centered(self, xy: Vec2) -> "Circle3d":
-        """To Be Filled In.
+        """Change the center of the circle.
         
         Args:
-            xy (Any): To Be Filled In.
+            xy: The new center of the circle.
         
         Returns:
-            To Be Filled In.
+            The circle for chaining.
         """
         xy = listiffy(xy)
         return self.send_only("centered", xy)
     
     def resized(self, radius: float) -> "Circle3d":
-        """To Be Filled In.
+        """Change the size of the circle.
         
         Args:
-            radius (float): To Be Filled In.
+            radius: The new radius of the circle.
         
         Returns:
-            To Be Filled In.
+            The circle for chaining.
         """
         return self.send_only("resized", radius)
