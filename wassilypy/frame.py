@@ -306,16 +306,16 @@ class Frame(marking.Styled):
                     fromMaxxy: Any,
                     toMinxy: Any,
                     toMaxxy: Any) -> "Frame":
-        """To Be Filled In.
+        """A frame region within this frame..
         
         Args:
-            fromMinxy (Any): To Be Filled In.
-            fromMaxxy (Any): To Be Filled In.
-            toMinxy (Any): To Be Filled In.
-            toMaxxy (Any): To Be Filled In.
+            fromMinxy (Any): Minimum coordinates of the source region.
+            fromMaxxy (Any): Maximum coordinates of the source region.
+            toMinxy (Any): Minimum coordinates of the target region.
+            toMaxxy (Any): Maximum coordinates of the target region.
         
         Returns:
-            To Be Filled In.
+            The new frame corresponding to the specified region.
         """
         fromMinxy = listiffy(fromMinxy)
         fromMaxxy = listiffy(fromMaxxy)
@@ -332,16 +332,16 @@ class Frame(marking.Styled):
                 lookAtPoint: Any,
                 perspective: bool = True,
                 upVector: Any = None) -> "Frame3d":
-        """To Be Filled In.
+        """Create a 3D frame.
         
         Args:
-            eyePoint (Any): To Be Filled In.
-            lookAtPoint (Any): To Be Filled In.
-            perspective (bool, optional): To Be Filled In.
-            upVector (Any, optional): To Be Filled In.
+            eyePoint (Any): The point from which to view the scene.
+            lookAtPoint (Any): The point at which to look.
+            perspective (bool, optional): Whether to use perspective projection.
+            upVector (Any, optional): The vector indicating the upward direction.
         
         Returns:
-            To Be Filled In.
+            The new 3D frame.
         """
         eyePoint = listiffy(eyePoint)
         lookAtPoint = listiffy(lookAtPoint)
@@ -358,15 +358,6 @@ class Frame(marking.Styled):
             self,
             styled_name: str,
             constructor: None = None) -> marking.Styled:
-        """To Be Filled In.
-        
-        Args:
-            styled_name (str): To Be Filled In.
-            constructor (None, optional): To Be Filled In.
-        
-        Returns:
-            To Be Filled In.
-        """
         ...
 
     @overload
@@ -374,15 +365,6 @@ class Frame(marking.Styled):
             self,
             styled_name: str,
             constructor: Callable[[Any, Any], TWrapped]) -> TWrapped:
-        """To Be Filled In.
-        
-        Args:
-            styled_name (str): To Be Filled In.
-            constructor (Callable[[Any, Any], TWrapped]): To Be Filled In.
-        
-        Returns:
-            To Be Filled In.
-        """
         ...
 
     def getStyledByName(
@@ -390,56 +372,56 @@ class Frame(marking.Styled):
             styled_name: str,
             constructor: Optional[Callable[[Any, Any], TWrapped]] = None
             ) -> marking.Styled:
-        """To Be Filled In.
+        """Get a styled element by its name from the frame.
         
         Args:
-            styled_name (str): To Be Filled In.
-            constructor (Optional[Callable[[Any, Any], TWrapped]], optional): To Be Filled In.
+            styled_name: The name of the styled element to retrieve.
+            constructor: The constructor to use for creating the styled element.
         
         Returns:
-            To Be Filled In.
+            A python wrapper for the styled element with the specified name.
         """
         if constructor is None:
             constructor = marking.Styled
         return self.wrapResult("getStyledByName", constructor, styled_name)  
     
     def nameImageFromURL(self, name: str, url: str) -> "Frame":
-        """To Be Filled In.
+        """Create an image from a URL and name it.
         
         Args:
-            name (str): To Be Filled In.
-            url (str): To Be Filled In.
+            name (str): The name to assign to the image.
+            url (str): The URL of the image to create.
         
         Returns:
-            To Be Filled In.
+            The frame for chaining.
         """
         return self.send_only("nameImageFromURL", name, url)
 
     def pauseRedraw(self) -> "Frame":
-        """To Be Filled In.
+        """Pause the redraw of the frame.
         
         Returns:
-            To Be Filled In.
+            The frame for chaining.
         """
         return self.send_only("pauseRedraw")
 
     def resumeRedraw(self) -> "Frame":
-        """To Be Filled In.
+        """Resume the redraw of the frame.
         
         Returns:
-            To Be Filled In.
+            The frame for chaining.
         """
         return self.send_only("resumeRedraw")
 
     def nameImageFromPNGData(self, name: str, png_data: Any) -> "Frame":
-        """To Be Filled In.
+        """Create an image from PNG data and name it.
         
         Args:
-            name (str): To Be Filled In.
-            png_data (Any): To Be Filled In. PNG-encoded binary image data.
+            name (str): The name to assign to the image.
+            png_data (Any): PNG-encoded binary image data.
         
         Returns:
-            To Be Filled In.
+            The frame for chaining.
         """
         png_data = force_uint8_array(png_data)
         return self.send_only("nameImageFromPNGData", name, png_data)
@@ -451,17 +433,18 @@ class Frame(marking.Styled):
             size: Any = None,
             offset: Any = [0,0],
             scaled: bool = False) -> marking.Image:
-        """To Be Filled In.
+        """Place a PNG image on the frame.
         
         Args:
-            point (Any): To Be Filled In.
-            pngdata (Any): To Be Filled In.
-            size (Any, optional): To Be Filled In.
-            offset (Any, optional): To Be Filled In.
-            scaled (bool, optional): To Be Filled In.
+            point (Any): The point where the image will be placed in frame coordinates.
+            pngdata (Any): The PNG-encoded binary image data.
+            size (Any, optional): The size of the image (defaults to image size).
+
+            offset (Any, optional): Shift the image by this amount.
+            scaled (bool, optional): Whether the image should be scaled (defaults to False).
         
         Returns:
-            To Be Filled In.
+            A python wrapper for the image.
         """
         pngdata = force_uint8_array(pngdata)
         return self.wrapResult(
@@ -475,31 +458,31 @@ class Frame(marking.Styled):
             size: Any = None,
             offset: Any = [0,0],
             scaled: bool = False) -> marking.Image:
-        """To Be Filled In.
+        """Create an image from a named source and place it on the frame.
         
         Args:
-            point (Any): To Be Filled In.
-            name (str): To Be Filled In.
-            size (Any, optional): To Be Filled In.
-            offset (Any, optional): To Be Filled In.
-            scaled (bool, optional): To Be Filled In.
+            point (Any): The point where the image will be placed in frame coordinates.
+            name (str): The name of the image to create.
+            size (Any, optional): The size of the image (defaults to image size).
+            offset (Any, optional): Shift the image by this amount.
+            scaled (bool, optional): Whether the image should be scaled (defaults to False).
         
         Returns:
-            To Be Filled In.
+            A python wrapper for the image.
         """
         return self.wrapResult(
             "namedImage", marking.Image,
             point, name, size, offset, scaled)
     
     def line(self, start: Any, end: Any) -> marking.Line:
-        """To Be Filled In.
+        """Create a line on the frame.
         
         Args:
-            start (Any): To Be Filled In.
-            end (Any): To Be Filled In.
+            start (Any): The starting point of the line.
+            end (Any): The ending point of the line.
         
         Returns:
-            To Be Filled In.
+            A python wrapper for the line.
         """
         return self.wrapResult("line", marking.Line, start, end)
     
@@ -508,15 +491,15 @@ class Frame(marking.Styled):
             center: Any,
             radius: float,
             scaled: bool = False) -> marking.Circle:
-        """To Be Filled In.
+        """Create a dot on the frame.
         
         Args:
-            center (Any): To Be Filled In.
-            radius (float): To Be Filled In.
-            scaled (bool, optional): To Be Filled In.
+            center (Any): The center point of the dot.
+            radius (float): The radius of the dot.
+            scaled (bool, optional): Whether the dot should be scaled (defaults to False).
         
         Returns:
-            To Be Filled In.
+            A python wrapper for the dot.
         """
         return self.wrapResult("dot", marking.Circle, center, radius, scaled)
     
@@ -525,15 +508,15 @@ class Frame(marking.Styled):
             center: Any,
             radius: float,
             scaled: bool = True) -> marking.Circle:
-        """To Be Filled In.
+        """Create a circle on the frame.
         
         Args:
-            center (Any): To Be Filled In.
-            radius (float): To Be Filled In.
-            scaled (bool, optional): To Be Filled In.
+            center (Any): The center point of the circle.
+            radius (float): The radius of the circle.
+            scaled (bool, optional): Whether the circle should be scaled (defaults to True).
         
         Returns:
-            To Be Filled In.
+            A python wrapper for the circle.
         """
         return self.wrapResult("circle", marking.Circle, center, radius, scaled)
     
@@ -544,17 +527,17 @@ class Frame(marking.Styled):
             offset: Any = [0,0],
             scaled: bool = True,
             rotationDegrees: float = 0) -> marking.Rect:
-        """To Be Filled In.
+        """Create a rectangle on the frame.
         
         Args:
-            point (Any): To Be Filled In.
-            size (Any): To Be Filled In.
-            offset (Any, optional): To Be Filled In.
-            scaled (bool, optional): To Be Filled In.
-            rotationDegrees (float, optional): To Be Filled In.
+            point (Any): The point where the rectangle will be placed in frame coordinates.
+            size (Any): The size of the rectangle.
+            offset (Any, optional): Shift the rectangle by this amount.
+            scaled (bool, optional): Whether the rectangle should be scaled (defaults to True).
+            rotationDegrees (float, optional): The rotation of the rectangle in degrees (defaults to 0).
         
         Returns:
-            To Be Filled In.
+            A python wrapper for the rectangle.
         """
         return self.wrapResult(
             "rect", marking.Rect, 
@@ -566,16 +549,16 @@ class Frame(marking.Styled):
             size: Any,
             offset: Any = [0,0],
             scaled: bool = False) -> marking.Rect:
-        """To Be Filled In.
+        """Create a box on the frame.
         
         Args:
-            point (Any): To Be Filled In.
-            size (Any): To Be Filled In.
-            offset (Any, optional): To Be Filled In.
-            scaled (bool, optional): To Be Filled In.
+            point (Any): The point where the box will be placed in frame coordinates.
+            size (Any): The size of the box.
+            offset (Any, optional): Shift the box by this amount.
+            scaled (bool, optional): Whether the box should be scaled (defaults to False).
         
         Returns:
-            To Be Filled In.
+            A python wrapper for the box.
         """
         return self.wrapResult(
             "box", marking.Rect, 
@@ -587,16 +570,16 @@ class Frame(marking.Styled):
             side: float,
             offset: Any = [0,0],
             scaled: bool = False) -> marking.Rect:
-        """To Be Filled In.
+        """Create a square on the frame.
         
         Args:
-            point (Any): To Be Filled In.
-            side (float): To Be Filled In.
-            offset (Any, optional): To Be Filled In.
-            scaled (bool, optional): To Be Filled In.
+            point (Any): The point where the square will be placed in frame coordinates.
+            side (float): The side length of the square.
+            offset (Any, optional): Shift the square by this amount.
+            scaled (bool, optional): Whether the square should be scaled (defaults to False).
         
         Returns:
-            To Be Filled In.
+            A python wrapper for the square.
         """
         size = [side, side]
         return self.wrapResult(
@@ -604,24 +587,24 @@ class Frame(marking.Styled):
             point, size, offset, scaled)
     
     def polyline(self, points: Any) -> marking.Poly:
-        """To Be Filled In.
+        """Create a polyline on the frame.
         
         Args:
-            points (Any): To Be Filled In.
+            points (Any): The points that define the polyline.
         
         Returns:
-            To Be Filled In.
+            A python wrapper for the polyline.
         """
         return self.wrapResult("polyline", marking.Poly, points)
     
     def polygon(self, points: Any) -> marking.Poly:
-        """To Be Filled In.
+        """Create a polygon on the frame.
         
         Args:
-            points (Any): To Be Filled In.
+            points (Any): The points that define the polygon.
         
         Returns:
-            To Be Filled In.
+            A python wrapper for the polygon.
         """
         return self.wrapResult("polygon", marking.Poly, points).filled().closed()
     
@@ -632,17 +615,17 @@ class Frame(marking.Styled):
             shift: Any = [0,0],
             alignment: str = "left",
             background: Any = None) -> marking.TextBox:
-        """To Be Filled In.
+        """Create a text box on the frame.
         
         Args:
-            point (Any): To Be Filled In.
-            text (str): To Be Filled In.
-            shift (Any, optional): To Be Filled In.
-            alignment (str, optional): To Be Filled In.
-            background (Any, optional): To Be Filled In.
+            point (Any): The point where the text box will be placed in frame coordinates.
+            text (str): The text to display in the text box.
+            shift (Any, optional): Shift the text box by this amount.
+            alignment (str, optional): The alignment of the text within the box (defaults to "left").
+            background (Any, optional): The background color of the text box.
         
         Returns:
-            To Be Filled In.
+            A python wrapper for the text box.
         """
         return self.wrapResult(
             "textBox", marking.TextBox,
@@ -655,17 +638,17 @@ class Frame(marking.Styled):
             numPoints: int = 5,
             pointFactor: float = 2.0,
             degrees: float = 0) -> marking.Star:
-        """To Be Filled In.
+        """Create a star on the frame.
         
         Args:
-            center (Any): To Be Filled In.
-            innerRadius (float): To Be Filled In.
-            numPoints (int, optional): To Be Filled In.
-            pointFactor (float, optional): To Be Filled In.
-            degrees (float, optional): To Be Filled In.
+            center (Any): The center point of the star.
+            innerRadius (float): The radius of the inner points of the star.
+            numPoints (int, optional): The number of points on the star (defaults to 5).
+            pointFactor (float, optional): The factor by which to scale the outer points (defaults to 2.0).
+            degrees (float, optional): The rotation of the star in degrees (defaults to 0).
         
         Returns:
-            To Be Filled In.
+            A python wrapper for the star.
         """
         return self.wrapResult(
             "star", marking.Star,
@@ -678,30 +661,30 @@ class Frame(marking.Styled):
             tipDegrees: float = 30,
             tipLength: Optional[float] = None,
             tipFactor: float = 0.1) -> marking.Arrow:
-        """To Be Filled In.
+        """Create an arrow on the frame.
         
         Args:
-            back (Any): To Be Filled In.
-            tip (Any): To Be Filled In.
-            tipDegrees (float, optional): To Be Filled In.
-            tipLength (Optional[float], optional): To Be Filled In.
-            tipFactor (float, optional): To Be Filled In.
+            back (Any): The back point of the arrow.
+            tip (Any): The tip point of the arrow.
+            tipDegrees (float, optional): The angle of the arrow tip in degrees (defaults to 30).
+            tipLength (Optional[float], optional): The length of the arrow tip (defaults to None).
+            tipFactor (float, optional): The factor by which to scale the arrow tip (defaults to 0.1).
         
         Returns:
-            To Be Filled In.
+            A python wrapper for the arrow.
         """
         return self.wrapResult(
             "arrow", marking.Arrow,
             back, tip, tipDegrees, tipLength, tipFactor)
 
 def force_uint8_array(x: Any) -> np.ndarray:
-    """To Be Filled In.
+    """Convert bytes or numpy array to uint8 array.
     
     Args:
-        x (Any): To Be Filled In.
+        x (Any): The input data to convert.
     
     Returns:
-        To Be Filled In.
+        np.ndarray: The converted uint8 array.
     """
     if isinstance(x, np.ndarray):
         if x.dtype != np.uint8:
@@ -717,7 +700,7 @@ class Frame3d(marking.Styled):
 
     """To Be Filled In."""
     def lookAt(self, lookAtPoint: Any, epsilon: float = EPSILON) -> "Frame3d":
-        """To Be Filled In.
+        """Look at a point in 3D space. 
         
         Args:
             lookAtPoint (Any): To Be Filled In.
