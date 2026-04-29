@@ -3,22 +3,36 @@
 To Be Filled In.
 """
 
-from typing import Any, Callable, Optional, TypeVar, Union, overload, Protocol
+from typing import (
+    Any, 
+    Callable,
+    Optional, 
+    Protocol, 
+    Sequence, 
+    TypeVar,
+    Union, 
+    Annotated,
+    TypeAlias,
+    overload
+)
 
 import H5Gizmos as gz
 import numpy as np
 
 TStyled = TypeVar("TStyled", bound="Styled")
 TWrapped = TypeVar("TWrapped", bound="Styled")
+Number = Union[int, float]
+Vec2 = Union[np.ndarray, Sequence[Number]]
+Vec3 = Union[np.ndarray, Sequence[Number]]
 
 class EventHandler(Protocol):
     def __call__(
         self,
         name: str,
         eventType: str,
-        canvasXY: Any,
-        cartesianXY: Any,
-        frameXY: Any,
+        canvasXY: Vec2,
+        cartesianXY: Vec2,
+        frameXY: Vec2,
     ) -> None: ...
 
 def listiffy(x: Any) -> Any:
@@ -213,7 +227,10 @@ class Styled:
         """
         return self.send_only("linedWidth", width)
     
-    def dashed(self: TStyled, dash_list_or_null: Any) -> TStyled:
+    def dashed(
+            self: TStyled, 
+            dash_list_or_null: Optional[list[Number]],
+            ) -> TStyled:
         """Set the dash pattern for the line.
         
         Args:
@@ -224,7 +241,7 @@ class Styled:
         """
         return self.send_only("dashed", dash_list_or_null)
     
-    def setFramePoint(self: TStyled, xy: Any) -> TStyled:
+    def setFramePoint(self: TStyled, xy: Vec2) -> TStyled:
         """Set the position of the element in frame coordinates.
         
         Args:
@@ -236,7 +253,7 @@ class Styled:
         xy = listiffy(xy)
         return self.send_only("setFramePoint", xy)
     
-    def setPixel(self: TStyled, xy: Any) -> TStyled:
+    def setPixel(self: TStyled, xy: Vec2) -> TStyled:
         """Set the position of the element in pixel coordinates.
         
         Args:
@@ -248,7 +265,7 @@ class Styled:
         xy = listiffy(xy)
         return self.send_only("setPixel", xy)
     
-    def position(self: TStyled, xy: Any) -> TStyled:
+    def position(self: TStyled, xy: Vec2) -> TStyled:
         """Set the position of the element (in frame coordinates).
         
         Args:
@@ -278,7 +295,7 @@ class Styled:
 class Line(Styled):
     
     """A line segment element."""
-    def startAt(self, xy: Any) -> "Line":
+    def startAt(self, xy: Vec2) -> "Line":
         """Set the starting point of the line.
         
         Args:
@@ -290,7 +307,7 @@ class Line(Styled):
         xy = listiffy(xy)
         return self.send_only("startAt", xy)
     
-    def endAt(self, xy: Any) -> "Line":
+    def endAt(self, xy: Vec2) -> "Line":
         """Set the ending point of the line.
         
         Args:
@@ -305,7 +322,7 @@ class Line(Styled):
 class Circle(Styled):
     
     """To Be Filled In."""
-    def centerAt(self, xy: Any) -> "Circle":
+    def centerAt(self, xy: Vec2) -> "Circle":
         """To Be Filled In.
         
         Args:
@@ -353,7 +370,7 @@ class Rect(Styled):
         """
         return self.send_only("degrees", angle)
     
-    def resize(self, wh: Any) -> "Rect":
+    def resize(self, wh: Vec2) -> "Rect":
         """To Be Filled In.
         
         Args:
@@ -365,7 +382,7 @@ class Rect(Styled):
         wh = listiffy(wh)
         return self.send_only("resize", wh)
     
-    def offsetBy(self, xy: Any) -> "Rect":
+    def offsetBy(self, xy: Vec2) -> "Rect":
         """To Be Filled In.
         
         Args:
@@ -388,7 +405,7 @@ class Rect(Styled):
         """
         return self.send_only("scaling", boolean)
     
-    def locateAt(self, xy: Any) -> "Rect":
+    def locateAt(self, xy: Vec2) -> "Rect":
         """To Be Filled In.
         
         Args:
@@ -550,7 +567,7 @@ class Rect3d(Styled):
         """
         return self.send_only("degrees", angle)
     
-    def resize(self, wh: Any) -> "Rect3d":
+    def resize(self, wh: Vec2) -> "Rect3d":
         """To Be Filled In.
         
         Args:
@@ -562,7 +579,7 @@ class Rect3d(Styled):
         wh = listiffy(wh)
         return self.send_only("resize", wh)
     
-    def offsetBy(self, xy: Any) -> "Rect3d":
+    def offsetBy(self, xy: Vec2) -> "Rect3d":
         """To Be Filled In.
         
         Args:
@@ -585,7 +602,7 @@ class Rect3d(Styled):
         """
         return self.send_only("scaling", boolean)
     
-    def locateAt(self, xy: Any) -> "Rect3d":
+    def locateAt(self, xy: Vec2) -> "Rect3d":
         """To Be Filled In.
         
         Args:
@@ -623,7 +640,7 @@ class Circle3d(Styled):
         """
         return self.send_only("scaling", boolean)
     
-    def centered(self, xy: Any) -> "Circle3d":
+    def centered(self, xy: Vec2) -> "Circle3d":
         """To Be Filled In.
         
         Args:
